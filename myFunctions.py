@@ -741,7 +741,7 @@ def get_most_popular_tags(conn, count = 1):
       
       output_list = []
       for record in cur.fetchall():
-        output_list.append(record)
+        output_list.append((str(record[0]), int(record[1])))
 
       return (0, output_list)
 
@@ -766,8 +766,22 @@ def get_most_popular_tag_pairs(conn, count = 1):
         (1, None)
             Failure
     """
-    return 1, None
-
+    try:
+      cur = conn.cursor()
+      cur.execute(("SELECT T1.tagname, T2.tagname, COUNT(*) AS cnt "
+                   "FROM tags AS T1, tags AS T2 "
+                   "WHERE T1.pid = T2.pid AND T1.tagname < T2.tagname " 
+                   "GROUP BY T1.tagname, T2.tagname "
+                   "ORDER BY cnt DESC, T1.tagname ASC "
+                   "LIMIT %s;"), (count,))
+   
+      output_list = []
+      for record in cur.fetchall():
+        output_list.append((record[0], record[1], int(record[2]))) 
+  
+      return (0, output_list)     
+    except psy.DatabaseError, e:
+      return (1, None)
 
 def get_number_papers_user(conn, uname):
     """
@@ -781,8 +795,15 @@ def get_number_papers_user(conn, uname):
         (1, None)
             Failure
     """
-    return 1, None
+    try:
+      cur = conn.cursor()
+      cur.execute("SELECT COUNT(*) FROM papers WHERE username = %s;", (uname,))
+ 
+      count = cur.fetchone()[0]
+      return (0, int(count))
 
+    except psy.DatabaseError, e:
+      return (1, None)
 
 def get_number_liked_user(conn, uname):
     """
@@ -796,8 +817,14 @@ def get_number_liked_user(conn, uname):
         (1, None)
             Failure
     """
-    return 1, None
+    try:
+      cur = conn.cursor()
+      cur.execute("SELECT COUNT(*) FROM likes WHERE username = %s;", (uname,))
 
+      return (0, int(cur.fetchone()[0]))
+
+    except psy.DatabaseError, e:
+      return (1, None)
 
 def get_number_tags_user(conn, uname):
     """
@@ -813,5 +840,14 @@ def get_number_tags_user(conn, uname):
         (1, None)
             Failure
     """
-    return 1, None
+    try:
+      cur = conn.cursor()
+      cur.execute("SELECT COUNT(DISTINCT T.tagname) FROM papers AS P, tags AS T WHERE P.pid = T.pid AND P.username = %s;", (uname,))
+
+      count = cur.fetchone()[0]
+
+      return (0, int(count))
+
+    except psy.DatabaseError, e:
+      return (1, None)
 
