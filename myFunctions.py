@@ -259,6 +259,7 @@ def add_new_paper(conn, uname, title, desc, text, tags):
         # if it isn't, add it
         if (cur.fetchone()[0] == 0):
           cur.execute("INSERT INTO tagnames (tagname) VALUES (%s);", (tag,))
+  
         # add (pid, tag) instance to tags table
         cur.execute("INSERT INTO tags (pid, tagname) VALUES (%s, %s)", (pid, tag))
       
@@ -440,7 +441,16 @@ def get_timeline(conn, uname, count = 10):
         (1, None)
             Failure
     """
-    return 1, None
+    try:
+      cur = conn.cursor()
+      cur.execute(("SELECT P.pid, P.title, P.username, P.description, P.begin_time ""
+                   "FROM papers AS P "
+                   "WHERE P.username = %s "
+                   "ORDER BY P.begin_time DESC "
+                   "LIMIT %s"), (uname, count))
+
+    except psy.DatabaseError, e:
+      return (1, None)
 
 
 def get_timeline_all(conn, count = 10):
