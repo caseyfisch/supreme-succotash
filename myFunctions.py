@@ -261,7 +261,7 @@ def add_new_paper(conn, uname, title, desc, text, tags):
           cur.execute("INSERT INTO tagnames (tagname) VALUES (%s);", (tag,))
   
         # add (pid, tag) instance to tags table
-        cur.execute("INSERT INTO tags (pid, tagname) VALUES (%s, %s)", (pid, tag))
+        cur.execute("INSERT INTO tags (pid, tagname) VALUES (%s, %s);", (pid, tag))
       
       # commit transaction 
       conn.commit()
@@ -286,7 +286,7 @@ def delete_paper(conn, pid):
     
     try: 
       cur = conn.cursor()
-      cur.execute("DELETE FROM papers WHERE pid = %s", (pid,))
+      cur.execute("DELETE FROM papers WHERE pid = %s;", (pid,))
       cur.commit()
       return (0, None)
     except psy.DatabaseError, e:
@@ -312,7 +312,7 @@ def get_paper_tags(conn, pid):
     
     try:
       cur = conn.cursor()
-      cur.execute("SELECT tagname FROM tags WHERE pid = %s");
+      cur.execute("SELECT tagname FROM tags WHERE pid = %s;");
 
       tag_list = []
       for record in cur:
@@ -342,20 +342,20 @@ def like_paper(conn, uname, pid):
     
     try:
       cur = conn.cursor()
-      cur.execute("SELECT COUNT(*) FROM likes WHERE pid = %s AND username = %s", (pid, uname))
+      cur.execute("SELECT COUNT(*) FROM likes WHERE pid = %s AND username = %s;", (pid, uname))
    
       if (cur.fetchOne()[0] != 0):
         # Username has already liked this paper, and can't like it twice
         return (1, None)
 
-      cur.execute("SELECT P.username FROM likes AS L, papers AS P WHERE L.pid = P.pid AND L.pid = %s", (pid,))
+      cur.execute("SELECT P.username FROM likes AS L, papers AS P WHERE L.pid = P.pid AND L.pid = %s;", (pid,))
 
       if (cur.fetchOne()[0] == uname):
         # The paper of interest was written by the current user, so he can't like it
         return (1, None)
 
       # Otherwise, record the like for the user
-      cur.execute("INSERT INTO likes (pid, username, like_time) VALUES (%s, %s, %s)", (pid, uname, datetime.now()))
+      cur.execute("INSERT INTO likes (pid, username, like_time) VALUES (%s, %s, %s);", (pid, uname, datetime.now()))
       cur.commit()
       return (0, None)
 
@@ -379,13 +379,13 @@ def unlike_paper(conn, uname, pid):
     
     try:
       cur = conn.cursor()
-      cur.execute("SELECT COUNT(*) FROM likes WHERE username = %s AND pid = %s", (uname, pid))
+      cur.execute("SELECT COUNT(*) FROM likes WHERE username = %s AND pid = %s;", (uname, pid))
       if (cur.fetchone()[0] == 0):
         # user has not yet liked this paper, so cannot unlike it
         return (1, None)
 
       # otherwise, user has liked paper, so can unlike it
-      cur.execute("DELETE FROM likes WHERE username = %s AND pid = %s", (uname, pid))
+      cur.execute("DELETE FROM likes WHERE username = %s AND pid = %s;", (uname, pid))
       cur.commit()
       return (0, None)
 
@@ -406,7 +406,7 @@ def get_likes(conn, pid):
     
     try:
       cur = conn.cursor()
-      cur.execute("SELECT COUNT(*) FROM likes WHERE pid = %s", (pid,))
+      cur.execute("SELECT COUNT(*) FROM likes WHERE pid = %s;", (pid,))
 
       like_count = cur.fetchone()[0]
 
@@ -452,7 +452,7 @@ def get_timeline(conn, uname, count = 10):
                    "FROM papers AS P "
                    "WHERE P.username = %s "
                    "ORDER BY P.begin_time DESC, P.pid ASC "
-                   "LIMIT %s"), (uname, count))
+                   "LIMIT %s;"), (uname, count))
 
 
       output_list = []
@@ -485,7 +485,7 @@ def get_timeline_all(conn, count = 10):
       cur.execute(("SELECT P.pid, P.username, P.title, P.begin_time, P.description "
                    "FROM papers AS P" 
                    "ORDER BY P.begin_time DESC, P.pid ASC "
-                   "LIMIT %s"), (count,))
+                   "LIMIT %s;"), (count,))
 
       output_list = []
       for record in cur.fetchall():
@@ -513,7 +513,22 @@ def get_most_popular_papers(conn, begin_time, count = 10):
         (1, None)
             Failure
     """
-    return 1, None
+
+    try:
+      cur = conn.cursor()
+      cur.execute(("SELECT P.pid, P.username, P.title, P.begin_time, P.description "
+                   "FROM papers AS P, (SELECT pid, COUNT(*) AS cnt FROM likes GROUP BY pid) AS L "
+                   "WHERE P.pid = L.pid AND P.begin_time > %s "
+                   "ORDER BY L.cnt DESC, P.pid ASC "
+                   "LIMIT %s;"), (begin_time, count))
+
+      output_list = []
+      for record in cur.fetchall():
+        output_list.append(record)      
+
+      return (0, output_list)
+    except psy.DatabaseError, e:
+      return (1, None)
 
 
 def get_recommend_papers(conn, uname, count = 10):
