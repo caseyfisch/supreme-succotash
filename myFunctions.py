@@ -379,7 +379,12 @@ def unlike_paper(conn, uname, pid):
     
     try:
       cur = conn.cursor()
-      # If there's nothing to delete, the user hasn't liked the paper before, but no action is taken anyway
+      cur.execute("SELECT COUNT(*) FROM likes WHERE username = %s AND pid = %s", (uname, pid))
+      if (cur.fetchone()[0] == 0):
+        # user has not yet liked this paper, so cannot unlike it
+        return (1, None)
+
+      # otherwise, user has liked paper, so can unlike it
       cur.execute("DELETE FROM likes WHERE username = %s AND pid = %s", (uname, pid))
       cur.commit()
       return (0, None)
@@ -403,7 +408,7 @@ def get_likes(conn, pid):
       cur = conn.cursor()
       cur.execute("SELECT COUNT(*) FROM likes WHERE pid = %s", (pid,))
 
-      like_count = cur.fetchOne()[0]
+      like_count = cur.fetchone()[0]
 
       return (0, like_count)
     except psy.DatabaseError, e:
@@ -443,11 +448,18 @@ def get_timeline(conn, uname, count = 10):
     """
     try:
       cur = conn.cursor()
-      cur.execute(("SELECT P.pid, P.title, P.username, P.description, P.begin_time ""
+      cur.execute(("SELECT P.pid, P.title, P.username, P.description, P.begin_time "
                    "FROM papers AS P "
                    "WHERE P.username = %s "
                    "ORDER BY P.begin_time DESC "
                    "LIMIT %s"), (uname, count))
+
+
+      output_list = []
+      for record in cur.fetchall():
+        output_list.append((record[0], record[2], record[1], record[4], record[3]))
+     
+      return (0, output_list)
 
     except psy.DatabaseError, e:
       return (1, None)
@@ -529,7 +541,7 @@ def get_papers_by_tag(conn, tag, count = 10):
     return 1, None
 
 
-def get_papers_by_keyword(conn, keyword, count = 10):
+def get_papers_by_keyword(conn, keywords, count = 10):
     """
     Get at most $count papers that match a keyword in its title, description *or* text field
 
