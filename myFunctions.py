@@ -706,7 +706,6 @@ def get_most_active_users(conn, count = 1):
     """
     
     try:
-      print "Most active users..."
       cur = conn.cursor()
       cur.execute("SELECT username, COUNT(*) AS cnt FROM papers GROUP BY username ORDER BY cnt DESC, username ASC LIMIT %s;", (count,))
 
@@ -736,7 +735,18 @@ def get_most_popular_tags(conn, count = 1):
         (1, None)
             Failure
     """
-    return 1, None
+    try:
+      cur = conn.cursor()
+      cur.execute("SELECT tagname, COUNT(*) AS cnt FROM tags GROUP BY tagname ORDER BY cnt DESC, tagname ASC LIMIT %s;", (count,))
+      
+      output_list = []
+      for record in cur.fetchall():
+        output_list.append(record)
+
+      return (0, output_list)
+
+    except psy.DatabaseError, e:
+      return (1, None)
 
 
 def get_most_popular_tag_pairs(conn, count = 1):
