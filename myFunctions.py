@@ -647,8 +647,23 @@ def get_papers_by_liked(conn, uname, count = 10):
         (1, None)
             Failure
     """
-    return 1, None
+   
+    try:
+      cur = conn.cursor()
+      cur.execute(("SELECT P.pid, P.username, P.title, P.begin_time, P.description " 
+                   "FROM papers AS P, likes AS L "
+                   "WHERE P.pid = L.pid AND L.username = %s "
+                   "ORDER BY L.like_time DESC, P.pid ASC "
+                   "LIMIT %s;"), (uname, count))
 
+      output_list = []
+      for record in cur.fetchall():
+        output_list.append(record)
+
+      return (0, output_list)
+
+    except psy.DatabaseError, e:
+      return (1, None)
 
 # Statistics related
 
