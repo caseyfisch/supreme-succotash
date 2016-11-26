@@ -176,7 +176,6 @@ def signup(conn, uname, pwd):
 
     except psy.DatabaseError, e:
       # Catch any database errors
-      print "error: ", e
       return (2, None)
 
 
@@ -218,7 +217,6 @@ def login(conn, uname, pwd):
 
     except psy.DatabaseError, e:
       # Catch any database errors
-      print "error: ", e
       return (3, None)
 
 
@@ -287,7 +285,7 @@ def delete_paper(conn, pid):
     try: 
       cur = conn.cursor()
       cur.execute("DELETE FROM papers WHERE pid = %s;", (pid,))
-      cur.commit()
+      conn.commit()
       return (0, None)
     except psy.DatabaseError, e:
       # catch database errors
@@ -316,7 +314,6 @@ def get_paper_tags(conn, pid):
 
       tag_list = []
       for record in cur:
-        print record
         tag_list.append(record[1])
       
       return (0, tag_list)
@@ -344,19 +341,21 @@ def like_paper(conn, uname, pid):
       cur = conn.cursor()
       cur.execute("SELECT COUNT(*) FROM likes WHERE pid = %s AND username = %s;", (pid, uname))
    
-      if (cur.fetchOne()[0] != 0):
+      if (cur.fetchone()[0] != 0):
         # Username has already liked this paper, and can't like it twice
         return (1, None)
 
-      cur.execute("SELECT P.username FROM likes AS L, papers AS P WHERE L.pid = P.pid AND L.pid = %s;", (pid,))
+      cur.execute("SELECT P.username FROM papers AS P where P.pid =  %s;", (pid,))
 
-      if (cur.fetchOne()[0] == uname):
-        # The paper of interest was written by the current user, so he can't like it
-        return (1, None)
+      for record in cur.fetchall():
+        if record[0] == uname:
+          return (1, None)
+
 
       # Otherwise, record the like for the user
       cur.execute("INSERT INTO likes (pid, username, like_time) VALUES (%s, %s, %s);", (pid, uname, datetime.now()))
-      cur.commit()
+      conn.commit()
+
       return (0, None)
 
     except psy.DatabaseError, e:
@@ -386,7 +385,7 @@ def unlike_paper(conn, uname, pid):
 
       # otherwise, user has liked paper, so can unlike it
       cur.execute("DELETE FROM likes WHERE username = %s AND pid = %s;", (uname, pid))
-      cur.commit()
+      conn.commit()
       return (0, None)
 
     except psy.DatabaseError, e:
@@ -483,7 +482,7 @@ def get_timeline_all(conn, count = 10):
     try:
       cur = conn.cursor()
       cur.execute(("SELECT P.pid, P.username, P.title, P.begin_time, P.description "
-                   "FROM papers AS P" 
+                   "FROM papers AS P " 
                    "ORDER BY P.begin_time DESC, P.pid ASC "
                    "LIMIT %s;"), (count,))
 
