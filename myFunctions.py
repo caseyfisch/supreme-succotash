@@ -627,7 +627,29 @@ def get_papers_by_keyword(conn, keywords, count = 10):
         (1, None)
             Failure
     """
-    return 1, None
+    try:
+      cur = conn.cursor()
+      cur.execute(("SELECT P.pid, P.username, P.title, P.begin_time, P.description "
+                  "FROM papers AS P "
+                  "WHERE title ILIKE '%%' || %s || ' %%' "
+                      "OR description ILIKE '%%' || %s || ' %%' "
+                      "OR data ILIKE '%%' || %s || ' %%' "
+                      "OR title ILIKE '%% ' || %s || '%%' "
+                      "OR description ILIKE '%% ' || %s || '%%' "
+                      "OR data ILIKE '%% ' || %s || '%%' "
+                  "ORDER BY P.begin_time DESC, P.pid ASC "
+                  "LIMIT %s;"), (keywords, keywords, keywords, keywords, keywords, keywords, count))
+
+      output_list = []
+      for record in cur.fetchall():
+        print record
+        output_list.append(record)
+
+      return (0, output_list)
+
+    except psy.DatabaseError, e:
+      print e
+      return (1, None)
 
 
 def get_papers_by_liked(conn, uname, count = 10):
