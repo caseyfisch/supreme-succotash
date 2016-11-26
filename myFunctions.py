@@ -448,16 +448,16 @@ def get_timeline(conn, uname, count = 10):
     """
     try:
       cur = conn.cursor()
-      cur.execute(("SELECT P.pid, P.title, P.username, P.description, P.begin_time "
+      cur.execute(("SELECT P.pid, P.username, P.title, P.begin_time, P.description "
                    "FROM papers AS P "
                    "WHERE P.username = %s "
-                   "ORDER BY P.begin_time DESC "
+                   "ORDER BY P.begin_time DESC, P.pid ASC "
                    "LIMIT %s"), (uname, count))
 
 
       output_list = []
       for record in cur.fetchall():
-        output_list.append((record[0], record[2], record[1], record[4], record[3]))
+        output_list.append(record)
      
       return (0, output_list)
 
@@ -480,8 +480,21 @@ def get_timeline_all(conn, count = 10):
         (1, None)
             Failure
     """
-    return 1, None
+    try:
+      cur = conn.cursor()
+      cur.execute(("SELECT P.pid, P.username, P.title, P.begin_time, P.description "
+                   "FROM papers AS P" 
+                   "ORDER BY P.begin_time DESC, P.pid ASC "
+                   "LIMIT %s"), (count,))
 
+      output_list = []
+      for record in cur.fetchall():
+        output_list.append(record)
+
+      return (0, output_list)
+
+    except psy.DatabaseError, e:
+      return (1, None)
 
 def get_most_popular_papers(conn, begin_time, count = 10):
     """
