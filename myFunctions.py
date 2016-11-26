@@ -281,7 +281,7 @@ def delete_paper(conn, pid):
         (0, None)   Success
         (1, None)   Failure
     """
-    
+    print "hello?"
     try: 
       cur = conn.cursor()
       cur.execute("DELETE FROM papers WHERE pid = %s;", (pid,))
@@ -411,6 +411,7 @@ def get_likes(conn, pid):
 
       return (0, like_count)
     except psy.DatabaseError, e:
+      print e
       return (1, None)
 
 # Search related
@@ -551,9 +552,9 @@ def get_recommend_papers(conn, uname, count = 10):
       cur = conn.cursor()
       cur.execute(("WITH Cohorts AS (SELECT L2.username, L2.pid "
                        "FROM likes AS L1, likes AS L2 "
-                       "WHERE T1.username = %s AND "
-                           "T1.username != T2.username AND "
-                           "T1.pid = T2.pid) "
+                       "WHERE L1.username = %s AND "
+                           "L1.username != L2.username AND "
+                           "L1.pid = L2.pid) "
                    "SELECT P.pid, P.username, P.title, P.begin_time, P.description "
                    "FROM Papers AS P, (SELECT pid, COUNT(*) AS cnt "
                                       "FROM likes "
@@ -561,7 +562,7 @@ def get_recommend_papers(conn, uname, count = 10):
                                           "pid NOT IN (SELECT pid FROM Cohorts) "
                    "GROUP BY pid) AS R "
                    "WHERE P.pid = R.pid "
-                   "ORDER BY R.cnt "
+                   "ORDER BY P.begin_time DESC, P.pid ASC "
                    "LIMIT %s;"), (uname, count))
 
 
@@ -629,20 +630,18 @@ def get_papers_by_keyword(conn, keywords, count = 10):
     """
     try:
       cur = conn.cursor()
-      cur.execute(("SELECT P.pid, P.username, P.title, P.begin_time, P.description "
-                  "FROM papers AS P "
-                  "WHERE title ILIKE '%%' || %s || ' %%' "
-                      "OR description ILIKE '%%' || %s || ' %%' "
-                      "OR data ILIKE '%%' || %s || ' %%' "
-                      "OR title ILIKE '%% ' || %s || '%%' "
-                      "OR description ILIKE '%% ' || %s || '%%' "
-                      "OR data ILIKE '%% ' || %s || '%%' "
-                  "ORDER BY P.begin_time DESC, P.pid ASC "
-                  "LIMIT %s;"), (keywords, keywords, keywords, keywords, keywords, keywords, count))
+      sql = ("SELECT P.pid, P.username, P.title, P.begin_time, P.description "
+             "FROM papers AS P "
+             "WHERE title ~* '\\y%s\\y' "
+             "OR description ~* '\\y%s\\y' "
+             "OR data ~* '\\y%s\\y' "
+             "ORDER BY P.begin_time DESC, P.pid ASC "
+             "LIMIT %s;") % (keywords, keywords, keywords, count)
+
+      cur.execute(sql)
 
       output_list = []
       for record in cur.fetchall():
-        print record
         output_list.append(record)
 
       return (0, output_list)
