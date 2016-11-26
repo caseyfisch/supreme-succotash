@@ -551,25 +551,26 @@ def get_recommend_papers(conn, uname, count = 10):
     try:
       cur = conn.cursor()
       cur.execute(("WITH Cohorts AS (SELECT L2.username, L2.pid "
-                         "FROM likes AS L1, likes AS L2 "
-                         "WHERE T1.username = %s AND "
-                         "T1.username != T2.username AND "
-                         "T1.pid = T2.pid) "
+                       "FROM likes AS L1, likes AS L2 "
+                       "WHERE T1.username = %s AND "
+                           "T1.username != T2.username AND "
+                           "T1.pid = T2.pid) "
                    "SELECT P.pid, P.username, P.title, P.begin_time, P.description "
                    "FROM Papers AS P, (SELECT pid, COUNT(*) AS cnt "
                                       "FROM likes "
                                       "WHERE username IN (SELECT username FROM Cohorts) AND "
-                                            "pid NOT IN (SELECT pid FROM Cohorts) "
-                                      "GROUP BY pid) AS R "
+                                          "pid NOT IN (SELECT pid FROM Cohorts) "
+                   "GROUP BY pid) AS R "
                    "WHERE P.pid = R.pid "
                    "ORDER BY R.cnt "
                    "LIMIT %s;"), (uname, count))
 
-       output_list = []
-       for record in cur.fetchall():
-         output_list.append(record)
 
-       return (0, output_list)
+      output_list = []
+      for record in cur.fetchall():
+        output_list.append(record)
+
+      return (0, output_list)
 
     except psy.DatabaseError, e:
       return (1, None)
@@ -591,7 +592,24 @@ def get_papers_by_tag(conn, tag, count = 10):
         (1, None)
             Failure
     """
-    return 1, None
+
+    try:
+      cur = conn.cursor()
+      cur.execute(("SELECT P.pid, P.username, P.title, P.begin_time, P.description "
+                   "FROM papers AS P, tags AS T "
+                   "WHERE P.pid = T.pid AND "
+                          "T.tagname = %s "
+                   "ORDER BY P.begin_time DESC, P.pid ASC "
+                   "LIMIT %s;"), (tag, count))
+
+      output_list = []
+      for record in cur.fetchall():
+        output_list.append(record)
+
+      return (0, output_list)
+
+    except psy.DatabaseError, e:
+      return (1, None)
 
 
 def get_papers_by_keyword(conn, keywords, count = 10):
