@@ -704,7 +704,20 @@ def get_most_active_users(conn, count = 1):
         (1, None)
             Failure
     """
-    return 1, None
+    
+    try:
+      print "Most active users..."
+      cur = conn.cursor()
+      cur.execute("SELECT username, COUNT(*) AS cnt FROM papers GROUP BY username ORDER BY cnt DESC, username ASC LIMIT %s;", (count,))
+
+      output_list = []
+      for record in cur.fetchall():
+        output_list.append(record[0])
+
+      return (0, output_list)
+
+    except psy.DatabaseError, e:
+      return (1, None)
 
 
 def get_most_popular_tags(conn, count = 1):
