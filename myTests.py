@@ -55,45 +55,16 @@ ALL_FUNCS = ['add_new_paper',
              'unlike_paper', 
              'like_paper']
 
-RES = {}
-VERBOSE = False
-
-def exit_test():
-  exit(1)
-
-
-def error_message(func, msg, should_abort = True):
-  RES[func.__name__] = False
-  print "[Error in %s]: %s" % (func.__name__, msg)
-  if should_abort:
-    exit_test()
-
-
-def format_error(func, should_abort = True):
-  error_message(func, "incorrect return value format", should_abort)
-
-
-def status_error(func, should_abort = True):
-  error_message(func, "failed unexpectedly", should_abort)
-
 
 def db_wrapper_debug(func, argdict, verbose = VERBOSE):
-  if verbose:
-    msg = "[Test] %s(" % func.__name__
-    for k,v in argdict.iteritems():
-      msg += " %s = %s," % (str(k), str(v))
-    msg += " )"
-    print msg
   res = db_wrapper.call_db(func, argdict)
-  if verbose:
-    print "\treturn: %s" % str(res)
   return res
 
 
 class TestFuncMethods(unittest.TestCase):
 
   def setUp(self):
-    RES[funcs.reset_db.__name__] = True
+    # reset database and add in some dummy values to work with later
     try:
       status, res = db_wrapper_debug(funcs.reset_db, {})
       if (status != SUCCESS): 
@@ -102,8 +73,6 @@ class TestFuncMethods(unittest.TestCase):
     except TypeError:
        format_error(funcs.reset_db)
 
-
-    RES[funcs.signup.__name__] = True
     try:
       for user in USERS:
         status, res = db_wrapper_debug(funcs.signup, {'uname': user, 'pwd': user})
@@ -113,34 +82,82 @@ class TestFuncMethods(unittest.TestCase):
       status, res = db_wrapper_debug(funcs.add_new_paper, {'uname': USERS[0], 
           'title': TITLES[0], 'desc': DESCS[0], 'text': TEXTS[0], 'tags': [TAGS[0], TAGS[1]]})
 
-    except TypeError:
-      format_error(funcs.signup)
+      status, res = db_wrapper_debug(funcs.add_new_paper, {'uname': USERS[0], 
+          'title': TITLES[1], 'desc': DESCS[1], 'text': TEXTS[1], 'tags': [TAGS[0], TAGS[3]]})
 
+      status, res = db_wrapper_debug(funcs.add_new_paper, {'uname': USERS[1], 
+          'title': TITLES[2], 'desc': DESCS[2], 'text': TEXTS[2], 'tags': [TAGS[0], TAGS[1]]})
+
+      status, res = db_wrapper_debug(funcs.add_new_paper, {'uname': USERS[2], 
+          'title': TITLES[3], 'desc': DESCS[3], 'text': TEXTS[3], 'tags': [TAGS[1], TAGS[2]]})
+
+    except TypeError:
+      pass
  
-  def tearDown(self):
-    pass  
 
   def test_signup_valid(self):
-    pass
+    try:
+      status, res = db_wrapper_debug(funcs.signup, {'uname': 'george', 'pwd': 'george'})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertIsNone(res)
+    except TypeError:
+      pass
+
  
   def test_signup_username_too_long(self):
-    pass
+    try:
+      long_user = "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
+      status, res = db_wrapper_debug(funcs.signup, {'uname': long_user, 'pwd': 'short'})
+      
+      self.assertEqual(status, 2)
+      self.assertEqual(res, None)
+    except TypeError:
+      pass      
 
  
   def test_signup_password_too_long(self):
-    pass
- 
+    try:
+      long_pass = "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
+      status, res = db_wrapper_debug(funcs.signup, {'uname': 'casey', 'pwd': long_pass})
+      
+      self.assertEqual(status, 2)
+      self.assertIsNone(res)
+    except TypeError:
+      pass 
+
 
   def test_signup_username_taken(self):
-    pass
+    try:
+      existing_user = 'alice'
+      status, res = db_wrapper_debug(funcs.signup, {'uname': existing_user, 'pwd': 'diff'})
+   
+      self.assertEqual(status, 1)
+      self.assertIsNone(res) 
+    except TypeError:
+      pass
 
  
   def test_login_valid(self):
-    pass
+    try:
+      user = USERS[0]
+      status, res = db_wrapper_debug(funcs.login, {'uname': user, 'pwd': user})
+     
+      self.assertEqual(status, SUCCESS)
+      self.assertIsNone(res)      
+    except TypeError:
+      pass
 
 
   def test_login_user_nonexistent(self):
-    pass
+    try:
+      non_user = 'casey'
+      status, res = db_wrapper_debug(funcs.login, {'uname': non_user, 'pwd': non_user})
+   
+      self.assertEqual(status, 1)
+      self.assertIsNone(res)
+    except TypeError:
+      pass
 
 
   def test_login_password_mismatch(self):
