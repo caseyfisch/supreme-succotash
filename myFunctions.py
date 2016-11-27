@@ -286,7 +286,6 @@ def delete_paper(conn, pid):
         (0, None)   Success
         (1, None)   Failure
     """
-    print "hello?"
     try: 
       cur = conn.cursor()
       cur.execute("DELETE FROM papers WHERE pid = %s;", (pid,))
@@ -315,11 +314,11 @@ def get_paper_tags(conn, pid):
     
     try:
       cur = conn.cursor()
-      cur.execute("SELECT tagname FROM tags WHERE pid = %s;");
+      cur.execute("SELECT tagname FROM tags WHERE pid = %s;", (pid,));
 
       tag_list = []
       for record in cur:
-        tag_list.append(record[1])
+        tag_list.append(record[0])
       
       return (0, tag_list)
     except psy.DatabaseError, e:
@@ -416,7 +415,6 @@ def get_likes(conn, pid):
 
       return (0, like_count)
     except psy.DatabaseError, e:
-      print e
       return (1, None)
 
 # Search related
@@ -661,7 +659,6 @@ def get_papers_by_keyword(conn, keywords, count = 10):
       return (0, output_list)
 
     except psy.DatabaseError, e:
-      print e
       return (1, None)
 
 
