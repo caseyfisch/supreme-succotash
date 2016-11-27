@@ -56,7 +56,7 @@ ALL_FUNCS = ['add_new_paper',
              'like_paper']
 
 
-def db_wrapper_debug(func, argdict, verbose = VERBOSE):
+def db_wrapper_debug(func, argdict, verbose = True):
   res = db_wrapper.call_db(func, argdict)
   return res
 
@@ -161,15 +161,50 @@ class TestFuncMethods(unittest.TestCase):
 
 
   def test_login_password_mismatch(self):
-    pass
+    try:
+      user = USERS[0]
+      pwd  = USERS[1]
+      status, res = db_wrapper_debug(funcs.login, {'uname': user, 'pwd': pwd})
+
+      self.assertEqual(status, 2)
+      self.assertIsNone(res)
+    except TypeError:
+      pass
 
 
   def test_add_new_paper_valid(self):
-    pass
+    try:
+      user = USERS[2]
+      title = "Test paper title"
+      desc = "Test paper description"
+      text = "Test paper text foo bar foo"
+      tags = ["tag1", "tag2", "tag3", TAGS[0]]
+
+      status, res = db_wrapper_debug(funcs.add_new_paper, {'uname': user, 'title': title,
+          'desc': desc, 'text': text, 'tags': tags})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertIsNotNone(res)
+    except TypeError:
+      pass
 
 
   def test_add_new_paper_nonalphanumeric_tag(self):
-    pass
+    try:
+      user = USERS[2]
+      title = "Test paper title"
+      desc = "Test paper description"
+      text = "Test paper text foo bar foo"
+      tags = ["what???"]
+
+      status, res = db_wrapper_debug(funcs.add_new_paper, {'uname': user, 'title': title,
+          'desc': desc, 'text': text, 'tags': tags})
+
+      self.assertEqual(status, 1)
+      self.assertIsNone(res)
+    except TypeError:
+      pass
+
 
   
   def test_add_new_paper_tag_too_long(self):
