@@ -251,6 +251,11 @@ def add_new_paper(conn, uname, title, desc, text, tags):
       pid = cur.fetchone()[0]
 
       for tag in tags:
+        # check that tag is alpha-numeric only
+        if (not tag.isalnum()):
+          conn.rollback()
+          return (1, None)
+
         # see if tag is already in tagnames
         cur.execute("SELECT COUNT(*) FROM tagnames WHERE tagname = %s;", (tag,))
 
