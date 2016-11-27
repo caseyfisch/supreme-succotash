@@ -23,7 +23,8 @@ TITLES = ["Oldest Living Yoga Celebrity Tells All",
           "Paper Cuts",
           "The Thin Gene"
          ]
-DESCS = ["'She said they helped elevate her consciousness,' a photographer says of the high heels preferred by Tao Porchon-Lynch.",
+DESCS = ["Description one", "Description two", "Description three", "Description four"]
+TEXTS = ["'She said they helped elevate her consciousness,' a photographer says of the high heels preferred by Tao Porchon-Lynch.",
          "A multibillion-dollar industry of skin-whitening products dominates the West African beauty market, creating a world of mixed messages for the women who live there.",
          "The Swiss art of Scherenschnitt tells stories in silhouette.",
          "The body of a woman whose mutation keeps her on the brink of starvation may hold the secret to treating obesity."
@@ -57,7 +58,67 @@ ALL_FUNCS = ['add_new_paper',
 RES = {}
 VERBOSE = False
 
+def exit_test():
+  exit(1)
+
+
+def error_message(func, msg, should_abort = True):
+  RES[func.__name__] = False
+  print "[Error in %s]: %s" % (func.__name__, msg)
+  if should_abort:
+    exit_test()
+
+
+def format_error(func, should_abort = True):
+  error_message(func, "incorrect return value format", should_abort)
+
+
+def status_error(func, should_abort = True):
+  error_message(func, "failed unexpectedly", should_abort)
+
+
+def db_wrapper_debug(func, argdict, verbose = VERBOSE):
+  if verbose:
+    msg = "[Test] %s(" % func.__name__
+    for k,v in argdict.iteritems():
+      msg += " %s = %s," % (str(k), str(v))
+    msg += " )"
+    print msg
+  res = db_wrapper.call_db(func, argdict)
+  if verbose:
+    print "\treturn: %s" % str(res)
+  return res
+
+
 class TestFuncMethods(unittest.TestCase):
+
+  def setUp(self):
+    RES[funcs.reset_db.__name__] = True
+    try:
+      status, res = db_wrapper_debug(funcs.reset_db, {})
+      if (status != SUCCESS): 
+        status_error(funcs.reset_deb)  
+  
+    except TypeError:
+       format_error(funcs.reset_db)
+
+
+    RES[funcs.signup.__name__] = True
+    try:
+      for user in USERS:
+        status, res = db_wrapper_debug(funcs.signup, {'uname': user, 'pwd': user})
+        if (status != SUCCESS):
+          status_error(funcs.signup)
+
+      status, res = db_wrapper_debug(funcs.add_new_paper, {'uname': USERS[0], 
+          'title': TITLES[0], 'desc': DESCS[0], 'text': TEXTS[0], 'tags': [TAGS[0], TAGS[1]]})
+
+    except TypeError:
+      format_error(funcs.signup)
+
+ 
+  def tearDown(self):
+    pass  
 
   def test_signup_valid(self):
     pass
@@ -314,5 +375,5 @@ class TestFuncMethods(unittest.TestCase):
     pass
 
 
-suite = unittest.TestLoader().loadTestsFromTestCase(TestFuncMethods)
-unittest.TextTestRunner(verbosity = 2).run(suite)
+suite_all = unittest.TestLoader().loadTestsFromTestCase(TestFuncMethods)
+unittest.TextTestRunner(verbosity = 2).run(suite_all)
