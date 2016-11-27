@@ -31,14 +31,28 @@ DESCS = ["'She said they helped elevate her consciousness,' a photographer says 
 
 TAGS = ["style", "health", "beauty", "opinion"]
 
-ALL_FUNCS = ['add_new_paper', 'delete_paper', 'get_paper_tags',
-             'get_papers_by_keyword', 'get_papers_by_tag',
-             'get_papers_by_liked', 'get_most_active_users',
-             'get_most_popular_papers', 'get_most_popular_tag_pairs',
-             'get_most_popular_tags', 'get_number_papers_user', 'get_number_tags_user',
-             'get_number_liked_user', 'get_recommend_papers', 'get_timeline',
-             'get_timeline_all', 'get_likes', 'login', 'reset_db',
-             'signup', 'unlike_paper', 'like_paper']
+ALL_FUNCS = ['add_new_paper', 
+             'delete_paper', 
+             'get_paper_tags',
+             'get_papers_by_keyword', 
+             'get_papers_by_tag',
+             'get_papers_by_liked', 
+             'get_most_active_users',
+             'get_most_popular_papers', 
+             'get_most_popular_tag_pairs',
+             'get_most_popular_tags', 
+             'get_number_papers_user', 
+             'get_number_tags_user',
+             'get_number_liked_user', 
+             'get_recommend_papers', 
+             'get_timeline',
+             'get_timeline_all', 
+             'get_likes', 
+             'login', 
+             'reset_db',
+             'signup', 
+             'unlike_paper', 
+             'like_paper']
 
 RES = {}
 VERBOSE = False
@@ -182,5 +196,123 @@ class TestFuncMethods(unittest.TestCase):
 
   def test_get_most_popular_papers_later_time(self):
     pass
+
+
+  def test_get_recommend_papers_valid(self):
+    pass
+
+
+  def test_get_recommend_papers_smaller_count_than_papers(self):
+    pass
+
+
+  def test_get_recommend_papers_larger_count_than_papers(self):
+    pass
+
+
+  def test_get_papers_by_tag_valid(self):
+    pass
+
+ 
+  def test_get_papers_by_tag_tag_nonexistent(self):
+    pass
+
+
+  def test_get_papers_by_tag_smaller_count_than_papers(self):
+    pass
+
+ 
+  def test_get_papers_by_tag_larger_count_than_papers(self):
+    pass
+
+
+  def test_get_papers_by_keyword_valid(self):
+    pass
+
+
+  def test_get_papers_by_keyword_keyword_not_found(self):
+    pass
+
+
+  def test_get_papers_by_keyword_smaller_count_than_papers(self):
+    pass
+
+
+  def test_get_papers_by_keyword_larger_count_than_papers(self):
+    pass
+
+
+  def get_papers_by_liked_valid(self):
+    pass
+
+
+  def get_papers_by_liked_smaller_count_than_papers(self):
+    pass
+
+
+  def get_papers_by_liked_larger_count_than_papers(self):
+    pass
+
+
+  def get_most_active_users_valid(self):
+    pass
+  
+
+  def get_most_active_users_smaller_count_than_users(self):
+    pass
+
+
+  def get_most_active_users_larger_count_than_users(self):
+    pass
+
+
+  def get_most_popular_tags_valid(self):
+    pass
+
+
+  def get_most_popular_tags_smaller_count_than_tags(self):
+    pass
+
+
+  def get_most_popular_tags_larger_count_than_tags(self):
+    pass
+
+
+  def get_most_popular_tag_pairs_valid(self):
+    pass
+
+
+  def get_most_popular_tag_pairs_smaller_count_than_tags(self):
+    pass
+
+
+  def get_most_popular_tag_pairs_larger_count_than_tags(self):
+    pass
+
+
+  def get_number_papers_user_valid(self):
+    pass
+
+
+  def get_number_papers_user_nonexistent(self):
+    pass
+
+
+  def get_number_liked_user_valid(self):
+    pass
+
+ 
+  def get_number_liked_user_nonexistent(self):
+    pass
+
+
+  def get_number_tags_user_valid(self):
+    pass
+
+  
+  def get_number_tags_user_nonexistent(self):
+    pass
+
+
 suite = unittest.TestLoader().loadTestsFromTestCase(TestFuncMethods)
 unittest.TextTestRunner(verbosity = 2).run(suite)
