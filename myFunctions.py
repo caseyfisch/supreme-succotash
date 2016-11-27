@@ -635,6 +635,7 @@ def get_papers_by_keyword(conn, keywords, count = 10):
     """
     try:
       cur = conn.cursor()
+      """
       sql = ("SELECT P.pid, P.username, P.title, P.begin_time, P.description "
              "FROM papers AS P "
              "WHERE title ~* '\\y%s\\y' "
@@ -642,8 +643,16 @@ def get_papers_by_keyword(conn, keywords, count = 10):
              "OR data ~* '\\y%s\\y' "
              "ORDER BY P.begin_time DESC, P.pid ASC "
              "LIMIT %s;") % (keywords, keywords, keywords, count)
-
-      cur.execute(sql)
+      """
+      sql = ("SELECT P.pid, P.username, P.title, P.begin_time, P.description "
+             "FROM papers AS P "
+             "WHERE title @@ to_tsquery(%s) "
+             "OR description @@ to_tsquery(%s) "
+             "OR data @@ to_tsquery(%s) "
+             "ORDER BY P.begin_time DESC, P.pid ASC "
+             "LIMIT %s;")
+      data = (keywords, keywords, keywords, count)
+      cur.execute(sql, data)
 
       output_list = []
       for record in cur.fetchall():
