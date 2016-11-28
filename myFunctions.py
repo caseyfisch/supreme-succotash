@@ -712,7 +712,10 @@ def get_most_active_users(conn, count = 1):
     
     try:
       cur = conn.cursor()
-      cur.execute("SELECT username, COUNT(*) AS cnt FROM papers GROUP BY username ORDER BY cnt DESC, username ASC LIMIT %s;", (count,))
+      cur.execute(("SELECT username, COUNT(*) AS cnt FROM papers "
+                   "GROUP BY username "
+                   "ORDER BY cnt DESC, username ASC "
+                   "LIMIT %s;"), (count,))
 
       output_list = []
       for record in cur.fetchall():
@@ -742,7 +745,10 @@ def get_most_popular_tags(conn, count = 1):
     """
     try:
       cur = conn.cursor()
-      cur.execute("SELECT tagname, COUNT(*) AS cnt FROM tags GROUP BY tagname ORDER BY cnt DESC, tagname ASC LIMIT %s;", (count,))
+      cur.execute(("SELECT tagname, COUNT(*) AS cnt FROM tags " 
+                   "GROUP BY tagname "
+                   "ORDER BY cnt DESC, tagname ASC " 
+                   "LIMIT %s;"), (count,))
       
       output_list = []
       for record in cur.fetchall():
@@ -848,7 +854,9 @@ def get_number_tags_user(conn, uname):
     """
     try:
       cur = conn.cursor()
-      cur.execute("SELECT COUNT(DISTINCT T.tagname) FROM papers AS P, tags AS T WHERE P.pid = T.pid AND P.username = %s;", (uname,))
+      cur.execute(("SELECT COUNT(DISTINCT T.tagname) "
+                   "FROM papers AS P, tags AS T " 
+                   "WHERE P.pid = T.pid AND P.username = %s;"), (uname,))
 
       count = cur.fetchone()[0]
 
