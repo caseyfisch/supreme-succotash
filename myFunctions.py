@@ -744,7 +744,7 @@ def get_most_popular_tags(conn, count = 1):
       
       output_list = []
       for record in cur.fetchall():
-        output_list.append((str(record[0]), int(record[1])))
+        output_list.append((record[0], record[1]))
 
       return (0, output_list)
 
@@ -780,7 +780,7 @@ def get_most_popular_tag_pairs(conn, count = 1):
    
       output_list = []
       for record in cur.fetchall():
-        output_list.append((record[0], record[1], int(record[2]))) 
+        output_list.append((record[0], record[1], record[2])) 
   
       return (0, output_list)     
     except psy.DatabaseError, e:
@@ -803,7 +803,7 @@ def get_number_papers_user(conn, uname):
       cur.execute("SELECT COUNT(*) FROM papers WHERE username = %s;", (uname,))
  
       count = cur.fetchone()[0]
-      return (0, int(count))
+      return (0, count)
 
     except psy.DatabaseError, e:
       return (1, None)
@@ -824,7 +824,7 @@ def get_number_liked_user(conn, uname):
       cur = conn.cursor()
       cur.execute("SELECT COUNT(*) FROM likes WHERE username = %s;", (uname,))
 
-      return (0, int(cur.fetchone()[0]))
+      return (0, cur.fetchone()[0])
 
     except psy.DatabaseError, e:
       return (1, None)
@@ -849,7 +849,7 @@ def get_number_tags_user(conn, uname):
 
       count = cur.fetchone()[0]
 
-      return (0, int(count))
+      return (0, count)
 
     except psy.DatabaseError, e:
       return (1, None)
