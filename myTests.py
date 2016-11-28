@@ -205,34 +205,84 @@ class TestFuncMethods(unittest.TestCase):
     except TypeError:
       pass
 
-
   
-  def test_add_new_paper_tag_too_long(self):
-    pass
-
-
   def test_add_new_paper_title_too_long(self):
-    pass
+    try:
+      user = USERS[2]
+      title = "Long title is long long title is long long title is long long title is long long title is long"
+      desc = "Test paper description"
+      text = "Test paper text foo bar foo"
+      tags = ["turkey"]
+
+      status, res = db_wrapper_debug(funcs.add_new_paper, {'uname': user, 'title': title,
+          'desc': desc, 'text': text, 'tags': tags})
+
+      self.assertEqual(status, 1)
+      self.assertIsNone(res)
+    except TypeError:
+      pass
+   
+
+  def test_add_new_paper_tag_too_long(self):
+    try:
+      user = USERS[2]
+      title = "Test paper title"
+      desc = "Test paper description"
+      text = "Test paper text foo bar foo"
+      tags = ["tagtagtagtagtagtagtagtagtagtagtagtagtagtagtagtagtagtagtagtagtagtagtagtagtagtagtagtagtagtagtagtag"]
+
+      status, res = db_wrapper_debug(funcs.add_new_paper, {'uname': user, 'title': title,
+          'desc': desc, 'text': text, 'tags': tags})
+
+      self.assertEqual(status, 1)
+      self.assertIsNone(res)
+    except TypeError:
+      pass
 
 
-  def test_add_new_paper_description_too_long(self):
-    pass
-
-  
   def test_delete_paper_valid(self):
-    pass
+    try:
+      pid = 1
+      status, res = db_wrapper_debug(funcs.delete_paper, {'pid': pid})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertIsNone(res)
+    except TypeError:
+      pass
 
 
   def test_delete_paper_invalid_pid(self):
-    pass
+    try:
+      # sort of a hoaky test, but if there's nothing to delete, nothing bad happens, so success
+      pid = 100
+      status, res = db_wrapper_debug(funcs.delete_paper, {'pid': pid})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertIsNone(res)
+    except TypeError:
+      pass
 
   
   def test_get_paper_tags_valid(self):
-    pass
+    try:
+      pid = 1
+      status, res = db_wrapper_debug(funcs.get_paper_tags, {'pid': pid})
+     
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(res, [TAGS[0], TAGS[1]])
+    except TypeError:
+      pass
 
 
   def test_get_paper_tags_invalid_pid(self):
-    pass
+    try:
+      pid = 100
+      status, res = db_wrapper_debug(funcs.get_paper_tags, {'pid': pid})
+    
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(res, [])
+    except TypeError:
+      pass
 
 
   def test_like_paper_valid(self):
