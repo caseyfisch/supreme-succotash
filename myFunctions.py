@@ -1,4 +1,4 @@
-"""
+^[[A"""
 Name:      Casey Fischer
 AndrewID:  cjfische
 """
@@ -565,9 +565,9 @@ def get_recommend_papers(conn, uname, count = 10):
                                       "WHERE username IN (SELECT username FROM Cohorts) AND "
                                           "pid NOT IN (SELECT pid FROM Cohorts) "
                    "GROUP BY pid) AS R "
-                   "WHERE P.pid = R.pid "
+                   "WHERE P.pid = R.pid AND P.username != %s "
                    "ORDER BY P.begin_time DESC, P.pid ASC "
-                   "LIMIT %s;"), (uname, count))
+                   "LIMIT %s;"), (uname, uname, count))
 
 
       output_list = []

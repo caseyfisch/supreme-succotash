@@ -729,14 +729,13 @@ class TestFuncMethods(unittest.TestCase):
       status, res = db_wrapper_debug(funcs.get_recommend_papers, {'uname': USERS[1]})
       
       self.assertEqual(status, SUCCESS)
-      self.assertEqual(len(res), 2)
-      self.assertEqual(res[0][0], 3)
-      self.assertEqual(res[1][0], 2)
+      self.assertEqual(len(res), 1)
+      self.assertEqual(res[0][0], 2)
 
     except TypeError:
       print "TypeError raised"
       pass
-    except Execption as e:
+    except Exception as e:
       print e
       pass
 
