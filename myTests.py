@@ -286,35 +286,123 @@ class TestFuncMethods(unittest.TestCase):
 
 
   def test_like_paper_valid(self):
-    pass
+    try:
+      pid = 1
+      user = USERS[3]
+      status, res = db_wrapper_debug(funcs.like_paper, {'pid': pid, 'uname': user})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertIsNone(res)
+
+    except TypeError:
+      pass
 
 
   def test_like_paper_author_is_user(self):
-    pass
+    try:
+      pid = 1
+      user = USERS[0]
+      status, res = db_wrapper_debug(funcs.like_paper, {'pid': pid, 'uname': user})
+
+      self.assertEqual(status, 1)
+      self.assertIsNone(res)
+
+    except TypeError:
+      pass
 
 
   def test_like_paper_user_already_liked(self):
-    pass
+    try:
+      pid = 1
+      user = USERS[3]
+      status, res = db_wrapper_debug(funcs.like_paper, {'pid': pid, 'uname': user})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertIsNone(res)
+
+      status, res = db_wrapper_debug(funcs.like_paper, {'pid': pid, 'uname': user})
+     
+      # this call to like should fail because they've already liked the paper
+      self.assertEqual(status, 1)
+      self.assertIsNone(res)
+
+    except TypeError:
+      pass
+     
 
 
   def test_like_paper_invalid_pid(self):
-    pass
+    try:
+      pid = 100
+      user = USERS[2]
+      # this causes a foreign key constraint error
+      status, res = db_wrapper_debug(funcs.like_paper, {'pid': pid, 'uname': user})
+
+      self.assertEqual(status, 1)
+      self.assertIsNone(res)
+    except TypeError:
+      pass
 
   
   def test_unlike_paper_valid(self):
-    pass
+    try:
+      pid = 1
+      user = USERS[2]
+ 
+      # like followed by unlike
+      status, res = db_wrapper_debug(funcs.like_paper, {'pid': pid, 'uname': user})
+      status, res = db_wrapper_debug(funcs.unlike_paper, {'pid': pid, 'uname': user})
+      
+      self.assertEqual(status, SUCCESS)
+      self.assertIsNone(res)
+
+    except TypeError:
+      pass
 
   
   def test_unlike_paper_user_has_not_liked(self):
-    pass
+    try:
+      pid = 1
+      user = USERS[2]
+
+      status, res = db_wrapper_debug(funcs.unlike_paper, {'pid': pid, 'uname': user})
+      
+      self.assertEqual(status, 1)
+      self.assertIsNone(res)
+
+    except TypeError:
+      pass
 
 
   def test_unlike_paper_invalid_pid(self):
-    pass
+    try:
+      pid = 100
+      user = USERS[2]
+
+      status, res = db_wrapper_debug(funcs.unlike_paper, {'pid': pid, 'uname': user})
+
+      self.assertEqual(status, 1)
+      self.assertIsNone(res)
+
+    except TypeError:
+      pass
 
 
   def test_get_likes_valid(self):
-    pass
+    try:
+      pid = 1
+      
+      status, res = db_wrapper_debug(funcs.like_paper, {'pid': pid, 'uname': USERS[1]})
+      status, res = db_wrapper_debug(funcs.like_paper, {'pid': pid, 'uname': USERS[2]})
+      status, res = db_wrapper_debug(funcs.like_paper, {'pid': pid, 'uname': USERS[3]})
+
+      status, res = db_wrapper_debug(funcs.get_likes, {'pid': pid})
+      
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(res, 3)
+
+    except TypeError:
+      pass
 
 
   def test_get_likes_invalid_pid(self):

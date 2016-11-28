@@ -356,6 +356,7 @@ def like_paper(conn, uname, pid):
           return (1, None)
 
 
+
       # Otherwise, record the like for the user
       cur.execute("INSERT INTO likes (pid, username, like_time) VALUES (%s, %s, %s);", (pid, uname, datetime.now()))
       conn.commit()
