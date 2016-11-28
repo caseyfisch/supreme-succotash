@@ -707,33 +707,153 @@ class TestFuncMethods(unittest.TestCase):
 
   def test_get_papers_by_liked_valid(self):
     try:
-      raise ValueError
+      status, res = db_wrapper_debug(funcs.get_papers_by_liked, {'uname': USERS[1]})
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(len(res), 0)
+
+      status, res = db_wrapper_debug(funcs.like_paper, {'uname': USERS[1], 'pid': 4 })
+      status, res = db_wrapper_debug(funcs.like_paper, {'uname': USERS[1], 'pid': 2 })
+      status, res = db_wrapper_debug(funcs.like_paper, {'uname': USERS[1], 'pid': 1 })
+
+      status, res = db_wrapper_debug(funcs.get_papers_by_liked, {'uname': USERS[1]})
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(len(res), 3)
+     
     except Exception as e:
       print e
       raise 
 
+
+  def test_get_papers_by_liked_nonexistent_user(self):
+    try:
+      status, res = db_wrapper_debug(funcs.get_papers_by_liked, {'uname': 'casey'})
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(len(res), 0)
+
+      status, res = db_wrapper_debug(funcs.like_paper, {'uname': USERS[1], 'pid': 4 })
+      status, res = db_wrapper_debug(funcs.like_paper, {'uname': USERS[1], 'pid': 2 })
+      status, res = db_wrapper_debug(funcs.like_paper, {'uname': USERS[1], 'pid': 1 })
+
+      status, res = db_wrapper_debug(funcs.get_papers_by_liked, {'uname': 'casey'})
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(len(res), 0)
+     
+    except Exception as e:
+      print e
+      raise 
+
+
   def test_get_most_active_users_valid(self):
-    pass
+    try:
+      status, res = db_wrapper_debug(funcs.get_most_active_users, {})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(len(res), 1)
+      self.assertEqual(res[0], USERS[0])
+
+      status, res = db_wrapper_debug(funcs.get_most_active_users, {'count': len(USERS)})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(len(res), 3)
+      self.assertEqual(res[0], USERS[0])  # alice
+      self.assertEqual(res[1], USERS[1])  # bob
+      self.assertEqual(res[2], USERS[2])  # carlos
+
+    except Exception as e:
+      print e
+      raise
   
 
   def test_get_most_popular_tags_valid(self):
-    pass
+    try:
+      status, res = db_wrapper_debug(funcs.get_most_popular_tags, {})
+    
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(len(res), 1)
+      self.assertEqual(res[0][0], TAGS[1])
+
+      status, res = db_wrapper_debug(funcs.get_most_popular_tags, {'count': len(TAGS)})
+      
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(len(res), len(TAGS))
+      self.assertEqual(res[0][0], TAGS[1])  # health,  3
+      self.assertEqual(res[1][0], TAGS[0])  # style,   3
+      self.assertEqual(res[2][0], TAGS[2])  # beauty,  1
+      self.assertEqual(res[3][0], TAGS[3])  # opinion, 1
+
+    except Exception as e:
+      print e
+      raise
 
 
   def test_get_most_popular_tag_pairs_valid(self):
-    pass
+    try:
+      status, res = db_wrapper_debug(funcs.get_most_popular_tag_pairs, {})
+
+      self.assertEqual(status, SUCCESS) 
+      self.assertEqual(len(res), 1)
+      self.assertEqual(res[0][0], TAGS[1])  # health
+      self.assertEqual(res[0][1], TAGS[0])  # style
+
+      status, res = db_wrapper_debug(funcs.get_most_popular_tag_pairs, {'count': 5})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(len(res), 3)
+      self.assertEqual(res[1][0], TAGS[2])  # beauty, health
+      self.assertEqual(res[1][1], TAGS[1])
+      self.assertEqual(res[2][0], TAGS[3])  # opinion, style
+      self.assertEqual(res[2][1], TAGS[0])
+
+    except Exception as e:
+      print e
+      raise 
 
 
   def test_get_number_papers_user_valid(self):
-    pass
+    try:
+      status, res = db_wrapper_debug(funcs.get_number_papers_user, {'uname': USERS[0]})
+   
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(res, 2)
+
+    except Exception as e:
+      print e
+      raise
 
 
   def test_get_number_papers_user_nonexistent(self):
-    pass
+    try: 
+      user = 'casey'
+      self.assertNotIn(user, USERS)
 
+      status, res = db_wrapper_debug(funcs.get_number_papers_user, {'uname': user})
+   
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(res, 0)
+
+    except Exception as e:
+      print e
+      raise
+    
 
   def test_get_number_liked_user_valid(self):
-    pass
+    try:
+      status, res = db_wrapper_debug(funcs.get_number_liked_user, {'uname': USERS[1]})
+      
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(res, 0)
+
+      for likes in [[1, 1], [1, 2], [1, 3], [1, 4]]:
+        status, res = db_wrapper_debug(funcs.like_paper, {'uname':USERS[likes[0]], 'pid':likes[1]})
+
+      status, res = db_wrapper_debug(funcs.get_number_liked_user, {'uname': USERS[1]})
+   
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(res, 3)  # he can't like his own paper!
+
+    except Exception as e:
+      print e
+      raise
 
  
   def test_get_number_liked_user_nonexistent(self):
