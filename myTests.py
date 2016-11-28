@@ -722,23 +722,72 @@ class TestFuncMethods(unittest.TestCase):
 
 
   def test_get_recommend_papers_valid(self):
-    pass
+    try:
+      for likes in [[1, 1], [2, 1], [2, 2], [2, 3], [3, 1], [3, 3]]:
+        status, res = db_wrapper_debug(funcs.like_paper, {'uname':USERS[likes[0]], 'pid':likes[1]})
+
+      status, res = db_wrapper_debug(funcs.get_recommend_papers, {'uname': USERS[1]})
+      
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(len(res), 2)
+      self.assertEqual(res[0][0], 3)
+      self.assertEqual(res[1][0], 2)
+
+    except TypeError:
+      print "TypeError raised"
+      pass
+    except Execption as e:
+      print e
+      pass
 
 
-  def test_get_recommend_papers_smaller_count_than_papers(self):
-    pass
+  def test_get_recommend_papers_no_recommendations(self):
+    try:
+      for likes in [[1,1], [2,2], [3,3], [4,4]]:
+        status, res = db_wrapper_debug(funcs.like_paper, {'uname':USERS[likes[0]], 'pid':likes[1]})
 
+      status, res = db_wrapper_debug(funcs.get_recommend_papers, {'uname': USERS[1]})
 
-  def test_get_recommend_papers_larger_count_than_papers(self):
-    pass
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(res, [])  
+ 
+    except TypeError:
+      print "TypeError raised"
+      pass
+    except Exception as e:
+      print e
+      pass
 
 
   def test_get_papers_by_tag_valid(self):
-    pass
+    try:
+      status, res = db_wrapper_debug(funcs.get_papers_by_tag, {'tag': TAGS[0]})
+      
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(len(res), 3)
+
+    except TypeError:
+      print "TypeError raised"
+      pass
+    except Exception as e:
+      print e
+      pass
 
  
   def test_get_papers_by_tag_tag_nonexistent(self):
-    pass
+    try:
+      status, res = db_wrapper_debug(funcs.get_papers_by_tag, {'tag': 'chicken'})
+      
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(res, [])
+
+    except TypeError:
+      print "TypeError raised"
+      pass
+    except Exception as e:
+      print e
+      pass
+
 
 
   def test_get_papers_by_tag_smaller_count_than_papers(self):
