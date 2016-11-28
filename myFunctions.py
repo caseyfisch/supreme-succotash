@@ -1,4 +1,4 @@
-^[[A"""
+"""
 Name:      Casey Fischer
 AndrewID:  cjfische
 """

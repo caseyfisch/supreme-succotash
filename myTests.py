@@ -67,14 +67,10 @@ class TestFuncMethods(unittest.TestCase):
     # reset database and add in some dummy values to work with later
     try:
       status, res = db_wrapper_debug(funcs.reset_db, {})
-      if (status != SUCCESS): 
-        status_error(funcs.reset_deb)  
-  
-    except TypeError:
-       format_error(funcs.reset_db)
+
     except Exception as e:
       print e
-      pass
+      raise 
 
     try:
       for user in USERS:
@@ -94,12 +90,9 @@ class TestFuncMethods(unittest.TestCase):
       status, res = db_wrapper_debug(funcs.add_new_paper, {'uname': USERS[2], 
           'title': TITLES[3], 'desc': DESCS[3], 'text': TEXTS[3], 'tags': [TAGS[1], TAGS[2]]})
 
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
-      print e
       pass
+      raise 
  
 
   def test_signup_valid(self):
@@ -108,12 +101,9 @@ class TestFuncMethods(unittest.TestCase):
 
       self.assertEqual(status, SUCCESS)
       self.assertIsNone(res)
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
  
   def test_signup_username_too_long(self):
@@ -123,12 +113,9 @@ class TestFuncMethods(unittest.TestCase):
       
       self.assertEqual(status, 2)
       self.assertEqual(res, None)
-    except TypeError:
-      print "TypeError raised"
-      pass      
     except Exception as e:
       print e
-      pass
+      raise 
 
  
   def test_signup_password_too_long(self):
@@ -138,12 +125,9 @@ class TestFuncMethods(unittest.TestCase):
       
       self.assertEqual(status, 2)
       self.assertIsNone(res)
-    except TypeError:
-      print "TypeError raised"
-      pass 
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_signup_username_taken(self):
@@ -153,12 +137,9 @@ class TestFuncMethods(unittest.TestCase):
    
       self.assertEqual(status, 1)
       self.assertIsNone(res) 
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
  
   def test_login_valid(self):
@@ -168,12 +149,9 @@ class TestFuncMethods(unittest.TestCase):
      
       self.assertEqual(status, SUCCESS)
       self.assertIsNone(res)      
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_login_user_nonexistent(self):
@@ -183,12 +161,9 @@ class TestFuncMethods(unittest.TestCase):
    
       self.assertEqual(status, 1)
       self.assertIsNone(res)
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_login_password_mismatch(self):
@@ -199,12 +174,9 @@ class TestFuncMethods(unittest.TestCase):
 
       self.assertEqual(status, 2)
       self.assertIsNone(res)
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_add_new_paper_valid(self):
@@ -220,12 +192,9 @@ class TestFuncMethods(unittest.TestCase):
 
       self.assertEqual(status, SUCCESS)
       self.assertIsNotNone(res)
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_add_new_paper_nonalphanumeric_tag(self):
@@ -241,12 +210,9 @@ class TestFuncMethods(unittest.TestCase):
 
       self.assertEqual(status, 1)
       self.assertIsNone(res)
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
   
   def test_add_new_paper_title_too_long(self):
@@ -262,12 +228,9 @@ class TestFuncMethods(unittest.TestCase):
 
       self.assertEqual(status, 1)
       self.assertIsNone(res)
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
    
 
   def test_add_new_paper_tag_too_long(self):
@@ -283,12 +246,9 @@ class TestFuncMethods(unittest.TestCase):
 
       self.assertEqual(status, 1)
       self.assertIsNone(res)
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_delete_paper_valid(self):
@@ -298,12 +258,9 @@ class TestFuncMethods(unittest.TestCase):
 
       self.assertEqual(status, SUCCESS)
       self.assertIsNone(res)
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_delete_paper_invalid_pid(self):
@@ -314,12 +271,9 @@ class TestFuncMethods(unittest.TestCase):
 
       self.assertEqual(status, SUCCESS)
       self.assertIsNone(res)
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
   
   def test_get_paper_tags_valid(self):
@@ -329,12 +283,9 @@ class TestFuncMethods(unittest.TestCase):
      
       self.assertEqual(status, SUCCESS)
       self.assertEqual(res, [TAGS[0], TAGS[1]])
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_get_paper_tags_invalid_pid(self):
@@ -344,12 +295,9 @@ class TestFuncMethods(unittest.TestCase):
     
       self.assertEqual(status, SUCCESS)
       self.assertEqual(res, [])
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_like_paper_valid(self):
@@ -361,12 +309,9 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, SUCCESS)
       self.assertIsNone(res)
 
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_like_paper_author_is_user(self):
@@ -378,12 +323,9 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, 1)
       self.assertIsNone(res)
 
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_like_paper_user_already_liked(self):
@@ -401,13 +343,9 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, 1)
       self.assertIsNone(res)
 
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
-      print e
-      pass
-     
+      print e     
+      raise 
 
 
   def test_like_paper_invalid_pid(self):
@@ -419,12 +357,9 @@ class TestFuncMethods(unittest.TestCase):
 
       self.assertEqual(status, 1)
       self.assertIsNone(res)
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
   
   def test_unlike_paper_valid(self):
@@ -439,12 +374,9 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, SUCCESS)
       self.assertIsNone(res)
 
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
   
   def test_unlike_paper_user_has_not_liked(self):
@@ -457,12 +389,9 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, 1)
       self.assertIsNone(res)
 
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_unlike_paper_invalid_pid(self):
@@ -475,12 +404,9 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, 1)
       self.assertIsNone(res)
 
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_get_likes_valid(self):
@@ -496,12 +422,9 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, SUCCESS)
       self.assertEqual(res, 3)
 
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_get_likes_invalid_pid(self):
@@ -513,12 +436,9 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, SUCCESS)
       self.assertEqual(res, 0)
 
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_get_timeline_valid(self):
@@ -536,12 +456,9 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(res[1][2], TITLES[0])
       self.assertEqual(res[1][4], DESCS[0])
  
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
  
   def test_get_timeline_smaller_count_than_papers(self):
@@ -558,12 +475,9 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(res[0][2], TITLES[1])
       self.assertEqual(res[0][4], DESCS[1])
       
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
   
  
   def test_get_timeline_larger_count_than_papers(self):
@@ -584,12 +498,9 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(res[1][2], TITLES[0])
       self.assertEqual(res[1][4], DESCS[0])
       
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
    
 
 
@@ -600,12 +511,9 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, SUCCESS)
       self.assertEqual(len(res), len(TITLES))
 
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_get_timeline_all_smaller_count_than_papers(self):
@@ -615,12 +523,9 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, SUCCESS)
       self.assertEqual(len(res), 2)
 
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
   
 
   def test_get_timeline_all_larger_count_than_papers(self):
@@ -630,12 +535,9 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, SUCCESS)
       self.assertEqual(len(res), 4)
 
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
  
@@ -657,12 +559,9 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, SUCCESS)
       self.assertEqual(res, [])
 
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_get_most_popular_papers_smaller_count_than_papers(self): 
@@ -685,12 +584,9 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, SUCCESS)
       self.assertEqual(res, [])
 
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_get_most_popular_papers_larger_count_than_papers(self):
@@ -713,12 +609,9 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, SUCCESS)
       self.assertEqual(res, [])
 
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_get_recommend_papers_valid(self):
@@ -732,12 +625,9 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(len(res), 1)
       self.assertEqual(res[0][0], 2)
 
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_get_recommend_papers_no_recommendations(self):
@@ -750,12 +640,9 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, SUCCESS)
       self.assertEqual(res, [])  
  
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
 
   def test_get_papers_by_tag_valid(self):
@@ -765,12 +652,9 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, SUCCESS)
       self.assertEqual(len(res), 3)
 
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
  
   def test_get_papers_by_tag_tag_nonexistent(self):
@@ -780,108 +664,87 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, SUCCESS)
       self.assertEqual(res, [])
 
-    except TypeError:
-      print "TypeError raised"
-      pass
     except Exception as e:
       print e
-      pass
+      raise 
 
-
-
-  def test_get_papers_by_tag_smaller_count_than_papers(self):
-    pass
-
- 
-  def test_get_papers_by_tag_larger_count_than_papers(self):
-    pass
 
 
   def test_get_papers_by_keyword_valid(self):
-    pass
+    try:
+      status, res = db_wrapper_debug(funcs.get_papers_by_keyword, {'keywords': 'oldest'})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(len(res), 1)
+      self.assertEqual(res[0][0], 1)
+
+      status, res = db_wrapper_debug(funcs.get_papers_by_keyword, {'keywords': 'description'})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(len(res), 4)  # all the papers
+
+    except Exception as e:
+      print e
+      raise 
 
 
   def test_get_papers_by_keyword_keyword_not_found(self):
-    pass
+    try:
+      status, res = db_wrapper_debug(funcs.get_papers_by_keyword, {'keywords': 'databases'})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(len(res), 0)
+
+      status, res = db_wrapper_debug(funcs.get_papers_by_keyword, {'keywords': 'ASDFJ'})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(len(res), 0)
+
+    except Exception as e:
+      print e
+      raise 
 
 
-  def test_get_papers_by_keyword_smaller_count_than_papers(self):
-    pass
+  def test_get_papers_by_liked_valid(self):
+    try:
+      raise ValueError
+    except Exception as e:
+      print e
+      raise 
 
-
-  def test_get_papers_by_keyword_larger_count_than_papers(self):
-    pass
-
-
-  def get_papers_by_liked_valid(self):
-    pass
-
-
-  def get_papers_by_liked_smaller_count_than_papers(self):
-    pass
-
-
-  def get_papers_by_liked_larger_count_than_papers(self):
-    pass
-
-
-  def get_most_active_users_valid(self):
+  def test_get_most_active_users_valid(self):
     pass
   
 
-  def get_most_active_users_smaller_count_than_users(self):
+  def test_get_most_popular_tags_valid(self):
     pass
 
 
-  def get_most_active_users_larger_count_than_users(self):
+  def test_get_most_popular_tag_pairs_valid(self):
     pass
 
 
-  def get_most_popular_tags_valid(self):
+  def test_get_number_papers_user_valid(self):
     pass
 
 
-  def get_most_popular_tags_smaller_count_than_tags(self):
+  def test_get_number_papers_user_nonexistent(self):
     pass
 
 
-  def get_most_popular_tags_larger_count_than_tags(self):
-    pass
-
-
-  def get_most_popular_tag_pairs_valid(self):
-    pass
-
-
-  def get_most_popular_tag_pairs_smaller_count_than_tags(self):
-    pass
-
-
-  def get_most_popular_tag_pairs_larger_count_than_tags(self):
-    pass
-
-
-  def get_number_papers_user_valid(self):
-    pass
-
-
-  def get_number_papers_user_nonexistent(self):
-    pass
-
-
-  def get_number_liked_user_valid(self):
+  def test_get_number_liked_user_valid(self):
     pass
 
  
-  def get_number_liked_user_nonexistent(self):
+  def test_get_number_liked_user_nonexistent(self):
     pass
 
 
-  def get_number_tags_user_valid(self):
+  def test_get_number_tags_user_valid(self):
     pass
 
   
-  def get_number_tags_user_nonexistent(self):
+  def test_get_number_tags_user_nonexistent(self):
     pass
 
 
