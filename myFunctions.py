@@ -353,9 +353,8 @@ def like_paper(conn, uname, pid):
 
       for record in cur.fetchall():
         if record[0] == uname:
+          # Username is trying to like his own paper
           return (1, None)
-
-
 
       # Otherwise, record the like for the user
       cur.execute("INSERT INTO likes (pid, username, like_time) VALUES (%s, %s, %s);", (pid, uname, datetime.now()))
@@ -384,6 +383,7 @@ def unlike_paper(conn, uname, pid):
     try:
       cur = conn.cursor()
       cur.execute("SELECT COUNT(*) FROM likes WHERE username = %s AND pid = %s;", (uname, pid))
+  
       if (cur.fetchone()[0] == 0):
         # user has not yet liked this paper, so cannot unlike it
         return (1, None)
@@ -391,6 +391,7 @@ def unlike_paper(conn, uname, pid):
       # otherwise, user has liked paper, so can unlike it
       cur.execute("DELETE FROM likes WHERE username = %s AND pid = %s;", (uname, pid))
       conn.commit()
+  
       return (0, None)
 
     except psy.DatabaseError, e:
@@ -531,6 +532,7 @@ def get_most_popular_papers(conn, begin_time, count = 10):
         output_list.append(record)      
 
       return (0, output_list)
+
     except psy.DatabaseError, e:
       return (1, None)
 
@@ -783,6 +785,7 @@ def get_most_popular_tag_pairs(conn, count = 1):
         output_list.append((record[0], record[1], record[2])) 
   
       return (0, output_list)     
+
     except psy.DatabaseError, e:
       return (1, None)
 
@@ -853,4 +856,3 @@ def get_number_tags_user(conn, uname):
 
     except psy.DatabaseError, e:
       return (1, None)
-
