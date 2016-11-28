@@ -511,6 +511,22 @@ class TestFuncMethods(unittest.TestCase):
       print e
       raise 
 
+  
+  def test_get_timeline_nonexistent_user(self):
+    try:
+      user = 'casey'
+      pid = 1
+      self.assertNotIn(user, USERS)
+  
+      status, res = db_wrapper_debug(funcs.get_timeline, {'uname': user})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(res, [])
+    except Exception as e:
+      print e
+      raise
+
+
  
   def test_get_timeline_smaller_count_than_papers(self):
     try:
