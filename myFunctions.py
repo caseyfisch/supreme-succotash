@@ -416,6 +416,7 @@ def get_likes(conn, pid):
       like_count = cur.fetchone()[0]
 
       return (0, like_count)
+
     except psy.DatabaseError, e:
       return (1, None)
 
