@@ -526,80 +526,13 @@ class TestFuncMethods(unittest.TestCase):
       print e
       raise
 
-
  
-  def test_get_timeline_smaller_count_than_papers(self):
-    try:
-      user = USERS[0]
-      count = 1
-
-      status, res = db_wrapper_debug(funcs.get_timeline, {'uname': user, 'count': count})
-
-      self.assertEqual(status, SUCCESS)
-      self.assertEqual(len(res), 1)
-    
-      self.assertEqual(res[0][1], user)
-      self.assertEqual(res[0][2], TITLES[1])
-      self.assertEqual(res[0][4], DESCS[1])
-      
-    except Exception as e:
-      print e
-      raise 
-  
- 
-  def test_get_timeline_larger_count_than_papers(self):
-    try:
-      user = USERS[0]
-      count = 5
-
-      status, res = db_wrapper_debug(funcs.get_timeline, {'uname': user, 'count': count})
-
-      self.assertEqual(status, SUCCESS)
-      self.assertEqual(len(res), 2)
-    
-      self.assertEqual(res[0][1], user)
-      self.assertEqual(res[0][2], TITLES[1])
-      self.assertEqual(res[0][4], DESCS[1])
-
-      self.assertEqual(res[1][1], user)
-      self.assertEqual(res[1][2], TITLES[0])
-      self.assertEqual(res[1][4], DESCS[0])
-      
-    except Exception as e:
-      print e
-      raise 
-   
-
   def test_get_timeline_all_valid(self):
     try:
       status, res = db_wrapper_debug(funcs.get_timeline_all, {'count': 4})
       
       self.assertEqual(status, SUCCESS)
       self.assertEqual(len(res), len(TITLES))
-
-    except Exception as e:
-      print e
-      raise 
-
-
-  def test_get_timeline_all_smaller_count_than_papers(self):
-    try:
-      status, res = db_wrapper_debug(funcs.get_timeline_all, {'count': 2})
-
-      self.assertEqual(status, SUCCESS)
-      self.assertEqual(len(res), 2)
-
-    except Exception as e:
-      print e
-      raise 
-  
-
-  def test_get_timeline_all_larger_count_than_papers(self):
-    try:
-      status, res = db_wrapper_debug(funcs.get_timeline_all, {'count': 10})
-
-      self.assertEqual(status, SUCCESS)
-      self.assertEqual(len(res), 4)
 
     except Exception as e:
       print e
@@ -629,54 +562,15 @@ class TestFuncMethods(unittest.TestCase):
       raise 
 
 
-  def test_get_most_popular_papers_smaller_count_than_papers(self): 
+  def test_get_most_popular_papers_invalid_time(self):
     try:
-      status, res = db_wrapper_debug(funcs.like_paper, {'pid': 1, 'uname': USERS[4]})
-      status, res = db_wrapper_debug(funcs.like_paper, {'pid': 2, 'uname': USERS[4]})
-      status, res = db_wrapper_debug(funcs.like_paper, {'pid': 3, 'uname': USERS[2]})
-      status, res = db_wrapper_debug(funcs.like_paper, {'pid': 4, 'uname': USERS[1]})
+      status, res = db_wrapper_debug(funcs.get_most_popular_papers, {'begin_time': 'turkey'})
 
-      status, res = db_wrapper_debug(funcs.get_most_popular_papers, {'count': 2, 'begin_time':datetime.now() + timedelta(days=-1)})
-
-      self.assertEqual(status, SUCCESS)
-      self.assertEqual(len(res), 2)
-      self.assertEqual(res[0][0], 1)
-      self.assertEqual(res[1][0], 2)
-
-      begin_time = datetime.now()
-      status, res = db_wrapper_debug(funcs.get_most_popular_papers, {'begin_time':datetime.now()})
-
-      self.assertEqual(status, SUCCESS)
-      self.assertEqual(res, [])
-
+      self.assertEqual(status, 1)
+      self.assertIsNone(res)
     except Exception as e:
       print e
-      raise 
-
-
-  def test_get_most_popular_papers_larger_count_than_papers(self):
-    try:
-      status, res = db_wrapper_debug(funcs.like_paper, {'pid': 1, 'uname': USERS[4]})
-      status, res = db_wrapper_debug(funcs.like_paper, {'pid': 2, 'uname': USERS[4]})
-      status, res = db_wrapper_debug(funcs.like_paper, {'pid': 3, 'uname': USERS[2]})
-      status, res = db_wrapper_debug(funcs.like_paper, {'pid': 4, 'uname': USERS[1]})
-
-      status, res = db_wrapper_debug(funcs.get_most_popular_papers, {'count': 10, 'begin_time':datetime.now() + timedelta(days=-1)})
-
-      self.assertEqual(status, SUCCESS)
-      self.assertEqual(len(res), 4)
-      self.assertEqual(res[0][0], 1)
-      self.assertEqual(res[1][0], 2)
-
-      begin_time = datetime.now()
-      status, res = db_wrapper_debug(funcs.get_most_popular_papers, {'begin_time':datetime.now()})
-
-      self.assertEqual(status, SUCCESS)
-      self.assertEqual(res, [])
-
-    except Exception as e:
-      print e
-      raise 
+      raise
 
 
   def test_get_recommend_papers_valid(self):
