@@ -483,19 +483,64 @@ class TestFuncMethods(unittest.TestCase):
   
  
   def test_get_timeline_larger_count_than_papers(self):
-    pass
+    try:
+      user = USERS[0]
+      count = 5
+
+      status, res = db_wrapper_debug(funcs.get_timeline, {'uname': user, 'count': count})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(len(res), 2)
+    
+      self.assertEqual(res[0][1], user)
+      self.assertEqual(res[0][2], TITLES[1])
+      self.assertEqual(res[0][4], DESCS[1])
+
+      self.assertEqual(res[1][1], user)
+      self.assertEqual(res[1][2], TITLES[0])
+      self.assertEqual(res[1][4], DESCS[0])
+      
+    except TypeError:
+      print "TypeError raised"
+      pass
+   
 
 
   def test_get_timeline_all_valid(self):
-    pass
+    try:
+      status, res = db_wrapper_debug(funcs.get_timeline_all, {'count': 5})
+      
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(len(res), len(TITLES))
+
+    except TypeError:
+      print "TypeError raised"
+      pass
 
 
   def test_get_timeline_all_smaller_count_than_papers(self):
-    pass
+    try:
+      status, res = db_wrapper_debug(funcs.get_timeline_all, {'count': 2})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(len(res), 2)
+
+    except TypeError:
+      print "TypeError raised"
+      pass
   
 
   def test_get_timeline_all_larger_count_than_papers(self):
-    pass
+    try:
+      status, res = db_wrapper_debug(funcs.get_timeline_all, {'count': 10})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(len(res), 4)
+
+    except TypeError:
+      print "TypeError raised"
+      pass
+
 
  
   def test_get_most_popular_papers_valid(self):
