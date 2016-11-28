@@ -503,7 +503,6 @@ class TestFuncMethods(unittest.TestCase):
       raise 
    
 
-
   def test_get_timeline_all_valid(self):
     try:
       status, res = db_wrapper_debug(funcs.get_timeline_all, {'count': 4})
@@ -538,7 +537,6 @@ class TestFuncMethods(unittest.TestCase):
     except Exception as e:
       print e
       raise 
-
 
  
   def test_get_most_popular_papers_valid(self):
@@ -667,7 +665,6 @@ class TestFuncMethods(unittest.TestCase):
     except Exception as e:
       print e
       raise 
-
 
 
   def test_get_papers_by_keyword_valid(self):
@@ -857,15 +854,61 @@ class TestFuncMethods(unittest.TestCase):
 
  
   def test_get_number_liked_user_nonexistent(self):
-    pass
+    try:
+      user = 'casey'
+      self.assertNotIn(user, USERS)
+
+      status, res = db_wrapper_debug(funcs.get_number_liked_user, {'uname': user})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(res, 0)
+
+    except Exception as e:
+      print e
+      raise
 
 
   def test_get_number_tags_user_valid(self):
-    pass
+    try:
+      status, res = db_wrapper_debug(funcs.get_number_tags_user, {'uname': USERS[0]})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(res, 3)
+
+      status, res = db_wrapper_debug(funcs.get_number_tags_user, {'uname': USERS[1]})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(res, 2)
+
+      status, res = db_wrapper_debug(funcs.get_number_tags_user, {'uname': USERS[2]})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(res, 2)
+
+      status, res = db_wrapper_debug(funcs.get_number_tags_user, {'uname': USERS[3]})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(res, 0)
+
+      
+    except Exception as e:
+      print e
+      raise
 
   
   def test_get_number_tags_user_nonexistent(self):
-    pass
+    try:
+      user = 'casey'
+      self.assertNotIn(user, USERS)
+
+      status, res = db_wrapper_debug(funcs.get_number_tags_user, {'uname': user})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(res, 0)
+
+    except Exception as e:
+      print e
+      raise
 
 
 suite_all = unittest.TestLoader().loadTestsFromTestCase(TestFuncMethods)
