@@ -196,6 +196,26 @@ class TestFuncMethods(unittest.TestCase):
       print e
       raise 
 
+  
+  def test_add_new_paper_nonexistent_user(self):
+    try:
+      user = 'casey'
+      self.assertNotIn(user, USERS)
+   
+      title = "test"
+      desc = "test"
+      text = "test"
+      tags = ["tag"]
+
+      status, res = db_wrapper_debug(funcs.add_new_paper, {'uname': user, 'title': title,
+          'desc': desc, 'text': text, 'tags': tags})
+   
+      self.assertEqual(status, 1)
+      self.assertIsNone(res)
+    except Exception as e:
+      print e
+      raise
+
 
   def test_add_new_paper_nonalphanumeric_tag(self):
     try:
