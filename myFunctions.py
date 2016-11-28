@@ -143,7 +143,6 @@ def reset_db(conn):
 
 # Basic APIs
 
-
 def signup(conn, uname, pwd):
     """
     Register a user with a username and password.
@@ -225,7 +224,6 @@ def login(conn, uname, pwd):
 
 
 # Event related
-
 
 def add_new_paper(conn, uname, title, desc, text, tags):
     """
@@ -338,8 +336,8 @@ def get_paper_tags(conn, pid):
     except psy.DatabaseError, e:
       return (1, None)
 
-# Vote related
 
+# Vote related
 
 def like_paper(conn, uname, pid):
     """
@@ -440,8 +438,8 @@ def get_likes(conn, pid):
     except psy.DatabaseError, e:
       return (1, None)
 
-# Search related
 
+# Search related
 
 def get_timeline(conn, uname, count = 10):
     """
@@ -525,6 +523,7 @@ def get_timeline_all(conn, count = 10):
 
     except psy.DatabaseError, e:
       return (1, None)
+
 
 def get_most_popular_papers(conn, begin_time, count = 10):
     """
@@ -733,8 +732,8 @@ def get_papers_by_liked(conn, uname, count = 10):
     except psy.DatabaseError, e:
       return (1, None)
 
-# Statistics related
 
+# Statistics related
 
 def get_most_active_users(conn, count = 1):
     """
@@ -841,6 +840,7 @@ def get_most_popular_tag_pairs(conn, count = 1):
     except psy.DatabaseError, e:
       return (1, None)
 
+
 def get_number_papers_user(conn, uname):
     """
     Get the number of papers posted by a given user.
@@ -864,6 +864,7 @@ def get_number_papers_user(conn, uname):
     except psy.DatabaseError, e:
       return (1, None)
 
+
 def get_number_liked_user(conn, uname):
     """
     Get the number of likes liked by the user
@@ -885,6 +886,7 @@ def get_number_liked_user(conn, uname):
 
     except psy.DatabaseError, e:
       return (1, None)
+
 
 def get_number_tags_user(conn, uname):
     """
