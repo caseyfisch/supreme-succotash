@@ -34,11 +34,13 @@ General rules:
 
     (2) General pattern for return value.
     Return value of every API defined here is a two element tuples (status, res).
-    Status indicates whether the API call is success or not. Status = 0 means success,
-    otherwise the web app will identify the error type by the value of the status.
+    Status indicates whether the API call is success or not. Status = 0 means 
+    success, otherwise the web app will identify the error type by the value of 
+    the status.
 
-    Res is the actual return value from the API. If the API has no return value, it should be
-    set to None. Otherwise it could be any python data structures or primitives.
+    Res is the actual return value from the API. If the API has no return value, 
+    it should be set to None. Otherwise it could be any python data structures 
+    or primitives.
 """
 
 
@@ -103,7 +105,8 @@ def reset_db(conn):
         );
         """,
         """
-        CREATE INDEX paper_text_idx ON papers USING gin(to_tsvector('english', data))
+        CREATE INDEX paper_text_idx ON papers USING 
+            gin(to_tsvector('english', data))
         """,
         """
         CREATE TABLE IF NOT EXISTS tagnames(
@@ -170,7 +173,8 @@ def signup(conn, uname, pwd):
         return (1, None)
       else:
         # Otherwise insert into the table
-        cur.execute("INSERT INTO users (username, password) VALUES (%s, %s);", (uname, pwd));
+        cur.execute(("INSERT INTO users (username, password) "
+                     "VALUES (%s, %s);"), (uname, pwd));
         conn.commit()
         return (0, None)
 
@@ -227,8 +231,8 @@ def add_new_paper(conn, uname, title, desc, text, tags):
     """
     Create a new paper with  tags.
     Note that this API should touch multiple tables.
-    Make sure you define a transaction properly. Also, don't forget to set the begin_time
-    of the paper as current time.
+    Make sure you define a transaction properly. 
+    Also, don't forget to set the begin_time of the paper as current time.
 
     :param conn: A postgres database connection object
     :param uname: A string of username
@@ -238,15 +242,19 @@ def add_new_paper(conn, uname, title, desc, text, tags):
     :param tags: A list of string, each element is a tag associate to the paper
     :return: (status, retval)
         (0, pid)    Success
-                    Return the pid of the newly inserted paper in the res field of the return value
+                    Return the pid of the newly inserted paper in the 
+                    res field of the return value
         (1, None)   Failure
     """
 
     try:
       cur = conn.cursor()
       # insert paper into paper table
-      cur.execute(("INSERT INTO papers (username, title, begin_time, description, data) "
-                   "VALUES (%s, %s, %s, %s, %s) RETURNING pid;"), (uname, title, datetime.now(), desc, text))
+      cur.execute(("INSERT INTO "
+                   "papers (username, title, begin_time, description, data) "
+                   "VALUES (%s, %s, %s, %s, %s) RETURNING pid;"), 
+                   (uname, title, datetime.now(), desc, text))
+
       # keep the pid for later
       pid = cur.fetchone()[0]
 
@@ -256,7 +264,8 @@ def add_new_paper(conn, uname, title, desc, text, tags):
           conn.rollback()
           return (1, None)
 
-        # see if tag is already in tagnames (otherwise we'll get a duplicate key error)
+        # see if tag is already in tagnames (otherwise we'll get a 
+        # duplicate key error)
         cur.execute("SELECT COUNT(*) FROM tagnames WHERE tagname = %s;", (tag,))
 
         # if it isn't, add it
@@ -304,8 +313,10 @@ def get_paper_tags(conn, pid):
     :param pid: An int of pid
     :return: (status, retval)
         (0, [tag1, tag2, ...])      Success
-                                    Return a list of string. Each string is a tag of the paper.
-                                    Note that the list should be sorted in a lexical ascending order.
+                                    Return a list of string. Each string is a 
+                                    tag of the paper.
+                                    Note that the list should be sorted in a 
+                                    lexical ascending order.
                                     Example:
                                             (0, ["database", "multi-versioned"])
 
@@ -314,7 +325,10 @@ def get_paper_tags(conn, pid):
     
     try:
       cur = conn.cursor()
-      cur.execute("SELECT tagname FROM tags WHERE pid = %s;", (pid,));
+      cur.execute(("SELECT tagname "
+                   "FROM tags "
+                   "WHERE pid = %s "
+                   "ORDER BY tagname ASC;"), (pid,));
 
       tag_list = []
       for record in cur:
@@ -331,7 +345,9 @@ def like_paper(conn, uname, pid):
     """
     Record a like for a paper. Timestamped the like with the current timestamp
 
-    You need to ensure that (1) a user should not like his/her own paper, (2) a user can not like a paper twice.
+    You need to ensure that 
+        (1) a user should not like his/her own paper, 
+        (2) a user can not like a paper twice.
 
     :param conn: A postgres database connection object
     :param uname: A string of username
@@ -343,7 +359,8 @@ def like_paper(conn, uname, pid):
     
     try:
       cur = conn.cursor()
-      cur.execute("SELECT COUNT(*) FROM likes WHERE pid = %s AND username = %s;", (pid, uname))
+      cur.execute("SELECT COUNT(*) FROM likes WHERE pid = %s AND username = %s;", 
+                  (pid, uname))
    
       if (cur.fetchone()[0] != 0):
         # Username has already liked this paper, and can't like it twice
@@ -357,7 +374,8 @@ def like_paper(conn, uname, pid):
           return (1, None)
 
       # Otherwise, record the like for the user
-      cur.execute("INSERT INTO likes (pid, username, like_time) VALUES (%s, %s, %s);", (pid, uname, datetime.now()))
+      cur.execute(("INSERT INTO likes (pid, username, like_time) "
+                   "VALUES (%s, %s, %s);"), (pid, uname, datetime.now()))
       conn.commit()
 
       return (0, None)
@@ -382,14 +400,16 @@ def unlike_paper(conn, uname, pid):
     
     try:
       cur = conn.cursor()
-      cur.execute("SELECT COUNT(*) FROM likes WHERE username = %s AND pid = %s;", (uname, pid))
+      cur.execute("SELECT COUNT(*) FROM likes WHERE username = %s AND pid = %s;",
+                  (uname, pid))
   
       if (cur.fetchone()[0] == 0):
         # user has not yet liked this paper, so cannot unlike it
         return (1, None)
 
       # otherwise, user has liked paper, so can unlike it
-      cur.execute("DELETE FROM likes WHERE username = %s AND pid = %s;", (uname, pid))
+      cur.execute("DELETE FROM likes WHERE username = %s AND pid = %s;", 
+                  (uname, pid))
       conn.commit()
   
       return (0, None)
@@ -427,15 +447,16 @@ def get_timeline(conn, uname, count = 10):
     """
     Get timeline of a user.
 
-    You should return $count most recent posts of a user. The result should be ordered first by time (newest first)
-    and then break ties by pid (ascending).
+    You should return $count most recent posts of a user. The result should be 
+    ordered first by time (newest first) and then break ties by pid (ascending).
 
     :param conn: A postgres database connection object
     :param uname: A string of username
     :param count: An int indicating the maximum number of papers you can return
     :return: (status, retval)
         (0, [(pid, username, title, begin_time, description), (...), ...])
-          Success, retval is a list of quintuple. Each element of the quintuple is of the following type:
+          Success, retval is a list of quintuple. Each element of the quintuple 
+          is of the following type:
             pid --  Integer
             username, title, description -- String
             begin_time  -- A datetime.datetime object
@@ -454,7 +475,8 @@ def get_timeline(conn, uname, count = 10):
     """
     try:
       cur = conn.cursor()
-      cur.execute(("SELECT P.pid, P.username, P.title, P.begin_time, P.description "
+      cur.execute(("SELECT P.pid, P.username, P.title, "
+                          "P.begin_time, P.description "
                    "FROM papers AS P "
                    "WHERE P.username = %s "
                    "ORDER BY P.begin_time DESC, P.pid ASC "
@@ -481,14 +503,16 @@ def get_timeline_all(conn, count = 10):
     :param count: An int indicating the maximum number of papers you can return
     :return: (status, retval)
         (0, [pid, username, title, begin_time, description), (...), ...])
-            Success, retval is a list of quintuple. Please refer to the format defined in get_timeline()'s return value
+            Success, retval is a list of quintuple. Please refer to 
+            the format defined in get_timeline()'s return value
 
         (1, None)
             Failure
     """
     try:
       cur = conn.cursor()
-      cur.execute(("SELECT P.pid, P.username, P.title, P.begin_time, P.description "
+      cur.execute(("SELECT P.pid, P.username, P.title, "
+                          "P.begin_time, P.description "
                    "FROM papers AS P " 
                    "ORDER BY P.begin_time DESC, P.pid ASC "
                    "LIMIT %s;"), (count,))
@@ -504,9 +528,12 @@ def get_timeline_all(conn, count = 10):
 
 def get_most_popular_papers(conn, begin_time, count = 10):
     """
-    Get at most $count papers posted after $begin_time according that have the most likes.
+    Get at most $count papers posted after $begin_time according that have 
+    the most likes.
 
-    You should order papers first by number of likes (descending) and break ties by pid (ascending).
+    You should order papers first by number of likes (descending) and 
+    break ties by pid (ascending).
+
     Also, paper with 0 like should not be listed here.
 
     :param conn: A postgres database connection object
@@ -514,7 +541,8 @@ def get_most_popular_papers(conn, begin_time, count = 10):
     :param count:   An integer
     :return: (status, retval)
         (0, [pid, username, title, begin_time, description), (...), ...])
-            Success, retval is a list of quintuple. Please refer to the format defined in get_timeline()'s return value
+            Success, retval is a list of quintuple. Please refer to the 
+            format defined in get_timeline()'s return value
 
         (1, None)
             Failure
@@ -522,8 +550,10 @@ def get_most_popular_papers(conn, begin_time, count = 10):
 
     try:
       cur = conn.cursor()
-      cur.execute(("SELECT P.pid, P.username, P.title, P.begin_time, P.description "
-                   "FROM papers AS P, (SELECT pid, COUNT(*) AS cnt FROM likes GROUP BY pid) AS L "
+      cur.execute(("SELECT P.pid, P.username, P.title, "
+                          "P.begin_time, P.description "
+                   "FROM papers AS P, (SELECT pid, COUNT(*) AS cnt "
+                                      "FROM likes GROUP BY pid) AS L "
                    "WHERE P.pid = L.pid AND P.begin_time > %s "
                    "ORDER BY L.cnt DESC, P.pid ASC "
                    "LIMIT %s;"), (begin_time, count))
@@ -549,7 +579,8 @@ def get_recommend_papers(conn, uname, count = 10):
     :param count:   An integer
     :return:    (status, retval)
         (0, [pid, username, title, begin_time, description), (...), ...])
-            Success, retval is a list of quintuple. Please refer to the format defined in get_timeline()'s return value
+            Success, retval is a list of quintuple. Please refer to the 
+            format defined in get_timeline()'s return value
 
         (1, None)
             Failure
@@ -562,10 +593,12 @@ def get_recommend_papers(conn, uname, count = 10):
                        "WHERE L1.username = %s AND "
                            "L1.username != L2.username AND "
                            "L1.pid = L2.pid) "
-                   "SELECT P.pid, P.username, P.title, P.begin_time, P.description "
+                   "SELECT P.pid, P.username, P.title, "
+                          "P.begin_time, P.description "
                    "FROM Papers AS P, (SELECT pid, COUNT(*) AS cnt "
                                       "FROM likes "
-                                      "WHERE username IN (SELECT username FROM Cohorts) AND "
+                                      "WHERE username IN (SELECT username "
+                                                         "FROM Cohorts) AND "
                                           "pid NOT IN (SELECT pid FROM Cohorts) "
                    "GROUP BY pid) AS R "
                    "WHERE P.pid = R.pid AND P.username != %s "
@@ -587,14 +620,16 @@ def get_papers_by_tag(conn, tag, count = 10):
     """
     Get at most $count papers that have the given tag
 
-    The result should first be ordered by begin time (newest first). Break ties by pid (ascending).
+    The result should first be ordered by begin time (newest first). Break 
+    ties by pid (ascending).
 
     :param conn: A postgres database connection object
     :param tag: A string of tag
     :param count: An integer
     :return:    (status, retval)
         (0, [pid, username, title, begin_time, description), (...), ...])
-            Success, retval is a list of quintuple. Please refer to the format defined in get_timeline()'s return value
+            Success, retval is a list of quintuple. Please refer to the 
+            format defined in get_timeline()'s return value
 
         (1, None)
             Failure
@@ -602,7 +637,8 @@ def get_papers_by_tag(conn, tag, count = 10):
 
     try:
       cur = conn.cursor()
-      cur.execute(("SELECT P.pid, P.username, P.title, P.begin_time, P.description "
+      cur.execute(("SELECT P.pid, P.username, P.title, "
+                          "P.begin_time, P.description "
                    "FROM papers AS P, tags AS T "
                    "WHERE P.pid = T.pid AND "
                           "T.tagname = %s "
@@ -621,16 +657,19 @@ def get_papers_by_tag(conn, tag, count = 10):
 
 def get_papers_by_keyword(conn, keywords, count = 10):
     """
-    Get at most $count papers that match a keyword in its title, description *or* text field
+    Get at most $count papers that match a keyword in its title, 
+    description *or* text field
 
-    The result should first be ordered by begin time (newest first). Break ties by pid (ascending).
+    The result should first be ordered by begin time (newest first). 
+    Break ties by pid (ascending).
 
     :param conn: A postgres database connection object
     :param keyword: A string of keyword, e.g. "database"
     :param count: An integer
     :return:    (status, retval)
         (0, [pid, username, title, begin_time, description), (...), ...])
-            Success, retval is a list of quintuple. Please refer to the format defined in get_timeline()'s return value
+            Success, retval is a list of quintuple. Please refer to the 
+            format defined in get_timeline()'s return value
 
         (1, None)
             Failure
@@ -661,14 +700,16 @@ def get_papers_by_liked(conn, uname, count = 10):
     """
     Get at most $count papers that liked by the given user.
 
-    The result should first be ordered by the time the like is made (newest first). Break ties by pid (ascending).
+    The result should first be ordered by the time the like is 
+    made (newest first). Break ties by pid (ascending).
 
     :param conn: A postgres database connection object
     :param uname: A string of username
     :param count: An integer
     :return:    (status, retval)
         (0, [pid, username, title, begin_time, description), (...), ...])
-            Success, retval is a list of quintuple. Please refer to the format defined in get_timeline()'s return value
+            Success, retval is a list of quintuple. Please refer to the 
+            format defined in get_timeline()'s return value
 
         (1, None)
             Failure
@@ -676,7 +717,8 @@ def get_papers_by_liked(conn, uname, count = 10):
    
     try:
       cur = conn.cursor()
-      cur.execute(("SELECT P.pid, P.username, P.title, P.begin_time, P.description " 
+      cur.execute(("SELECT P.pid, P.username, P.title, "
+                          "P.begin_time, P.description " 
                    "FROM papers AS P, likes AS L "
                    "WHERE P.pid = L.pid AND L.username = %s "
                    "ORDER BY L.like_time DESC, P.pid ASC "
@@ -698,15 +740,16 @@ def get_most_active_users(conn, count = 1):
     """
     Get at most $count users that post most papers.
 
-    The result should first be ordered by number of papers posted by the user. Break ties by username (lexically
-    ascending). User that never posted papers should not be listed.
+    The result should first be ordered by number of papers posted by the user. 
+    Break ties by username (lexically ascending). User that never posted papers
+    should not be listed.
 
     :param conn: A postgres database connection object
     :param count: An integer
     :return: (status, retval)
         (0, [uname1, uname2, ...])
-            Success, retval is a list of username. Each element in the list is a string. Return empty list if no
-            username found.
+            Success, retval is a list of username. Each element in the list 
+            is a string. Return empty list if no username found.
         (1, None)
             Failure
     """
@@ -732,15 +775,16 @@ def get_most_popular_tags(conn, count = 1):
     """
     Get at most $count many tags that gets most used among all papers
 
-    The result should first be ordered by number of papers that has the tags. Break ties by tag name (lexically
-    ascending).
+    The result should first be ordered by number of papers that has the 
+    tags. Break ties by tag name (lexically ascending).
 
     :param conn: A postgres database connection object
     :param count: An integer
     :return:
         (0, [(tagname1, count1), (tagname2, count2), ...])
-            Success, retval is a list of tagname. Each element is a pair where the first component is the tagname
-            and the second one is its count
+            Success, retval is a list of tagname. Each element is a pair 
+            where the first component is the tagname and the second one is 
+            its count
         (1, None)
             Failure
     """
@@ -765,15 +809,16 @@ def get_most_popular_tag_pairs(conn, count = 1):
     """
     Get at most $count many tag pairs that have been used together.
 
-    You should avoid duplicate pairs like (foo, bar) and (bar, foo). They should only be counted once with lexical
-    order. Results should first be ordered by number occurrences in papers. Break ties by tag name (lexically
-    ascending).
+    You should avoid duplicate pairs like (foo, bar) and (bar, foo). They should 
+    only be counted once with lexical order. Results should first be ordered by
+    number occurrences in papers. Break ties by tag name (lexically ascending).
 
     :param conn: A postgres database connection object
     :param count: An integer
     :return:
         (0, [(tag11, tag12, count), (tag21, tag22, count), (...), ...])
-            Success, retval is a list of three-tuples. The elements of the three-tuple are two strings and a count.
+            Success, retval is a list of three-tuples. The elements of the 
+            three-tuple are two strings and a count.
 
         (1, None)
             Failure
@@ -804,7 +849,8 @@ def get_number_papers_user(conn, uname):
     :param uname: A string of username
     :return:
         (0, count)
-            Success, retval is an integer indicating the number papers posted by the user
+            Success, retval is an integer indicating the number papers posted 
+            by the user
         (1, None)
             Failure
     """
@@ -826,7 +872,8 @@ def get_number_liked_user(conn, uname):
     :param uname:   A string of username
     :return:
         (0, count)
-            Success, retval is an integer indicating the number of likes liked by the user
+            Success, retval is an integer indicating the number of likes liked 
+            by the user
         (1, None)
             Failure
     """
@@ -849,7 +896,8 @@ def get_number_tags_user(conn, uname):
     :param uname:  A string of username
     :return:
         (0, count)
-            Success, retval is an integer indicating the number of tagnames used by the user
+            Success, retval is an integer indicating the number of tagnames 
+            used by the user
         (1, None)
             Failure
     """

@@ -302,7 +302,7 @@ class TestFuncMethods(unittest.TestCase):
       status, res = db_wrapper_debug(funcs.get_paper_tags, {'pid': pid})
      
       self.assertEqual(status, SUCCESS)
-      self.assertEqual(res, [TAGS[0], TAGS[1]])
+      self.assertEqual(res, [TAGS[1], TAGS[0]])
     except Exception as e:
       print e
       raise 
