@@ -334,6 +334,21 @@ class TestFuncMethods(unittest.TestCase):
       raise 
 
 
+  def test_like_paper_nonexistent_user(self):
+    try:
+      user = 'casey'
+      pid = 1
+      self.assertNotIn(user, USERS)
+  
+      status, res = db_wrapper_debug(funcs.like_paper, {'pid': pid, 'uname': user})
+
+      self.assertEqual(status, 1)
+      self.assertIsNone(res)
+    except Exception as e:
+      print e
+      raise
+
+
   def test_like_paper_author_is_user(self):
     try:
       pid = 1
