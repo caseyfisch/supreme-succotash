@@ -256,7 +256,7 @@ def add_new_paper(conn, uname, title, desc, text, tags):
           conn.rollback()
           return (1, None)
 
-        # see if tag is already in tagnames
+        # see if tag is already in tagnames (otherwise we'll get a duplicate key error)
         cur.execute("SELECT COUNT(*) FROM tagnames WHERE tagname = %s;", (tag,))
 
         # if it isn't, add it
