@@ -92,6 +92,7 @@ class TestFuncMethods(unittest.TestCase):
           'title': TITLES[3], 'desc': DESCS[3], 'text': TEXTS[3], 'tags': [TAGS[1], TAGS[2]]})
 
     except TypeError:
+      print "TypeError raised"
       pass
  
 
@@ -102,6 +103,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, SUCCESS)
       self.assertIsNone(res)
     except TypeError:
+      print "TypeError raised"
       pass
 
  
@@ -113,6 +115,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, 2)
       self.assertEqual(res, None)
     except TypeError:
+      print "TypeError raised"
       pass      
 
  
@@ -124,6 +127,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, 2)
       self.assertIsNone(res)
     except TypeError:
+      print "TypeError raised"
       pass 
 
 
@@ -135,6 +139,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, 1)
       self.assertIsNone(res) 
     except TypeError:
+      print "TypeError raised"
       pass
 
  
@@ -146,6 +151,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, SUCCESS)
       self.assertIsNone(res)      
     except TypeError:
+      print "TypeError raised"
       pass
 
 
@@ -157,6 +163,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, 1)
       self.assertIsNone(res)
     except TypeError:
+      print "TypeError raised"
       pass
 
 
@@ -169,6 +176,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, 2)
       self.assertIsNone(res)
     except TypeError:
+      print "TypeError raised"
       pass
 
 
@@ -186,6 +194,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, SUCCESS)
       self.assertIsNotNone(res)
     except TypeError:
+      print "TypeError raised"
       pass
 
 
@@ -203,6 +212,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, 1)
       self.assertIsNone(res)
     except TypeError:
+      print "TypeError raised"
       pass
 
   
@@ -220,6 +230,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, 1)
       self.assertIsNone(res)
     except TypeError:
+      print "TypeError raised"
       pass
    
 
@@ -237,6 +248,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, 1)
       self.assertIsNone(res)
     except TypeError:
+      print "TypeError raised"
       pass
 
 
@@ -248,6 +260,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, SUCCESS)
       self.assertIsNone(res)
     except TypeError:
+      print "TypeError raised"
       pass
 
 
@@ -260,6 +273,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, SUCCESS)
       self.assertIsNone(res)
     except TypeError:
+      print "TypeError raised"
       pass
 
   
@@ -271,6 +285,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, SUCCESS)
       self.assertEqual(res, [TAGS[0], TAGS[1]])
     except TypeError:
+      print "TypeError raised"
       pass
 
 
@@ -282,6 +297,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, SUCCESS)
       self.assertEqual(res, [])
     except TypeError:
+      print "TypeError raised"
       pass
 
 
@@ -295,6 +311,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertIsNone(res)
 
     except TypeError:
+      print "TypeError raised"
       pass
 
 
@@ -308,6 +325,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertIsNone(res)
 
     except TypeError:
+      print "TypeError raised"
       pass
 
 
@@ -327,6 +345,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertIsNone(res)
 
     except TypeError:
+      print "TypeError raised"
       pass
      
 
@@ -341,6 +360,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(status, 1)
       self.assertIsNone(res)
     except TypeError:
+      print "TypeError raised"
       pass
 
   
@@ -357,6 +377,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertIsNone(res)
 
     except TypeError:
+      print "TypeError raised"
       pass
 
   
@@ -371,6 +392,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertIsNone(res)
 
     except TypeError:
+      print "TypeError raised"
       pass
 
 
@@ -385,6 +407,7 @@ class TestFuncMethods(unittest.TestCase):
       self.assertIsNone(res)
 
     except TypeError:
+      print "TypeError raised"
       pass
 
 
@@ -402,19 +425,61 @@ class TestFuncMethods(unittest.TestCase):
       self.assertEqual(res, 3)
 
     except TypeError:
+      print "TypeError raised"
       pass
 
 
   def test_get_likes_invalid_pid(self):
-    pass
+    try:
+      pid = 100
+
+      status, res = db_wrapper_debug(funcs.get_likes, {'pid': pid})
+      
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(res, 0)
+
+    except TypeError:
+      print "TypeError raised"
+      pass
 
 
   def test_get_timeline_valid(self):
-    pass
+    try:
+      user = USERS[0]
+      status, res = db_wrapper_debug(funcs.get_timeline, {'uname': user})
+
+      self.assertEqual(status, SUCCESS)
+    
+      self.assertEqual(res[0][1], user)
+      self.assertEqual(res[0][2], TITLES[1])
+      self.assertEqual(res[0][4], DESCS[1])
+
+      self.assertEqual(res[1][1], user)
+      self.assertEqual(res[1][2], TITLES[0])
+      self.assertEqual(res[1][4], DESCS[0])
+ 
+    except TypeError:
+      print "TypeError raised"
+      pass
 
  
   def test_get_timeline_smaller_count_than_papers(self):
-    pass
+    try:
+      user = USERS[0]
+      count = 1
+
+      status, res = db_wrapper_debug(funcs.get_timeline, {'uname': user, 'count': count})
+
+      self.assertEqual(status, SUCCESS)
+      self.assertEqual(len(res), 1)
+    
+      self.assertEqual(res[0][1], user)
+      self.assertEqual(res[0][2], TITLES[1])
+      self.assertEqual(res[0][4], DESCS[1])
+      
+    except TypeError:
+      print "TypeError raised"
+      pass
   
  
   def test_get_timeline_larger_count_than_papers(self):
